@@ -1,0 +1,22 @@
+{
+  "name": "mvc9webserver",
+  "version": "0.9.1",
+  "description": "mvc9 web server(express + mvc9.js)",
+  "main": "/core/core.js",
+  "scripts": {
+    "start": "node launchServer.js"
+  },
+  "keywords": [
+    "mvc9",
+    "nodejs",
+    "webserver"
+  ],
+  "author": "mvc9.com",
+  "repository": "github.com/mvc9",
+  "license": "MIT",
+  "dependencies": {
+    "compression": "^1.6.2",
+    "express": "^4.14.1",
+    "file-stream-rotator": "0.0.7"
+  }
+}
