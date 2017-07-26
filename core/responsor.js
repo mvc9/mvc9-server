@@ -1,34 +1,63 @@
 module.exports = (request, response) => {
   const timeStamp = (new Date()).getTime();
-  response.set('X-Date-Time', (new Date()).toLocaleString());
-  response.set('X-Powered-By', config.server.ServerName);
-
   const comparse = modules.parser.extract(request);
-  // response.send(modules.parser.generateReport(comparse));
-  // return;
+  comparse.status = 200;
 
+  if (config.server.RequestDebug) {
+    response.send(modules.parser.generateReport(comparse));
+    return;
+  }
+
+  let responseLink = {};
+  let responseContent = '';
   const responseponseErrorPage = (path, status) => {
     let pageDocument = '';
     if (config.server.ErrorPage) {
-      pageDocument = fileSystem.readFileSync(`${path}\\${config.server.ErrorPage}\\${status}.${config.route.pageSuffix}`);
+      pageDocument = modules.buffer.readRes(`${path}\\${config.server.ErrorPage}\\${status}.${config.route.pageSuffix}`, null, false, config.server.BufferTime * 10);
     }
-    response.contentType('text/html');
-    response.status(status).send(pageDocument);
+    responseLink = {
+      type: 'error',
+      targetSuffix: config.route.pageSuffix
+    };
     comparse.status = status;
+    return pageDocument;
   }
 
   const webrootPath = `${config.rootDirectory}\\webroot`;
-  const vhostFolder = modules.router.toresponseFolder(comparse.host, config.vhost);
+  const vhostFolder = modules.router.toResFolder(comparse.host, config.vhost);
   if (!vhostFolder) {
-    responseponseErrorPage(webrootPath, 403);
-    return;
+    responseContent = responseponseErrorPage(webrootPath, 403);
+  } else {
+    const vhostresponsePath = `${webrootPath}\\${vhostFolder}`;
+    responseLink = modules.router.toRes(comparse.pathname, vhostresponsePath, config.route);
+    const resData = modules.router.loadRes(responseLink);
+    if (resData === false) {
+      responseContent = responseponseErrorPage(webrootPath, 404);
+    } else {
+      responseContent = resData;
+    }
   }
-  const vhostresponsePath = `${webrootPath}\\${vhostFolder}`;
-  const responseLink = modules.router.toresponse(comparse.pathname, vhostresponsePath, config.route);
-  const responseData = modules.router.loadresponse(responseLink);
-  if (responseData === false) {
-    responseponseErrorPage(webrootPath, 404);
-    return;
+
+  switch (responseLink.type) {
+    case 'api':
+    case 'page':
+      break;
   }
-  response.send(`vhostresponsePath: ${vhostresponsePath}<br />responseLink: ${JSON.stringify(responseLink)}<br />responseData: ${responseData}`);
+
+  response.set('X-Date-Time', (new Date()).toLocaleString());
+  response.set('X-Powered-By', config.server.ServerName);
+  response.type(responseLink.targetSuffix);
+  response.status(comparse.status).send(responseContent);
+  response.end();
+
+  comparse.timeCost = (new Date()).getTime() - timeStamp;
+
+  logOnConsole({
+    name: 'HTTP',
+    content: `STATUS ${comparse.status} | ${comparse.method.toUpperCase()} ${comparse.url} | ${comparse.clientAddress} | ${comparse.timeCost}ms`,
+    logLevel: 2
+  });
+  modules.logger.log(modules.logger.acccessLogBody(comparse));
+
+  // response.send(`vhostresponsePath: ${vhostresponsePath}<br />responseLink: ${JSON.stringify(responseLink)}<br />responseDataLength: ${responseData ? responseData.length : -1}`);
 }

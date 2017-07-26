@@ -9,21 +9,24 @@ buffer.intervalClear = setInterval(() => {
       delete bufferMemory[path].expireTime;
       delete bufferMemory[path].data;
       delete bufferMemory[path];
-      logOnConsole({ name: 'Buffer', content: `Clear expired memory "${path}"`, logLevel: 5 });
+      logOnConsole({ name: 'Buffer', content: `Clear expired buffer "${path}"`, logLevel: 5 });
     }
   });
 }, config.server.BufferTime);
 
-buffer.readRes = (path, alwaysReload) => {
+buffer.readRes = (path, charset, alwaysReload, lifeTime) => {
+  charset = charset || config.server.Charset;
+  lifeTime = lifeTime || config.server.BufferTime;
   const loadFile = (path) => {
     const isResExist = fileSystem.existsSync(path);
     let resContent = false;
     if (isResExist) {
-      resContent = fileSystem.readFileSync(path, config.server.Charset);
-      logOnConsole({ name: 'Buffer', content: `ReadResource form file "${path}"`, logLevel: 5 });
+      resContent = fileSystem.readFileSync(path, charset);
+      charset === config.server.FileCharset ? resContent = new Buffer(resContent, charset) : null;
+      logOnConsole({ name: 'Buffer', content: `Read form file "${path}"`, logLevel: 5 });
     }
     return {
-      expireTime: (new Date()).getTime() + config.server.BufferTime,
+      expireTime: (new Date()).getTime() + lifeTime,
       data: resContent,
     }
   }

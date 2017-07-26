@@ -9,11 +9,13 @@ reqestParser.extract = (request) => {
   reqParse['pathname'] = request._parsedUrl.pathname;
   reqParse['host'] = request.headers['host'];
   // reqParse['serverport'] = request.connection.server._connectionKey.match(/\d+$/g)[0];
-  reqParse['clientAddress'] = (request.headers['x-forwarded-for'] ||
+  reqParse['clientAddress'] = (
+    (request.headers['x-forwarded-for'] ||
     request.connection.remoteAddress ||
     request.socket.remoteAddress ||
     request.connection.socket.remoteAddress ||
-    '').match(/\d+\.\d+\.\d+\.\d+$/g)[0];
+    '')
+    .match(/\d+\.\d+\.\d+\.\d+$/g) || ['unknown'])[0];
   reqParse['dateTime'] = (new Date((new Date()).getTime() - (new Date()).getTimezoneOffset() * 60000).toISOString()).replace('T', ' ');
   reqParse['userAgent'] = request.headers['user-agent'];
   // for (let item in request.headers) {

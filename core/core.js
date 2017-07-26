@@ -16,6 +16,7 @@ global.startServer = () => {
   modules.buffer = require('./buffer');
   modules.router = require('./router');
   modules.responsor = require('./responsor');
+  modules.logger.log(modules.logger.accessLogHead());
 
   config.server.compressionOption = { level: config.server.CompressionLevel };
   config.server.EnableCompression ? server.use(compression(config.server.compressionOption)) : null;
@@ -27,5 +28,5 @@ global.startServer = () => {
 
   logOnConsole({ name: 'SERVER', content: 'Starting service ...', logLevel: 1 });
   modules.vhost.startListenPort(config.server.portList);
-  logOnConsole({ name: 'SERVER', content: 'Server is running success', logLevel: 1 });
+  logOnConsole({ name: 'SERVER', content: `Server is running up`, logLevel: 1 });
 }
