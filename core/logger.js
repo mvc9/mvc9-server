@@ -34,6 +34,7 @@ logger.accessLogHead = () => {
   if (!isThisLogExsist) {
     string = `<!doctype html><header><title>Access Log: ${logger.getCurrentDate()}</title><meta charset="${config.server.Charset}"></header>`;
     string = string + '<body style="background-color:#f6f6f6;color:#666;font-size:13px;font-family:micorsoft yahei;Arial;helvetica">';
+    string = string + '\r\n<style>table tr td {width:auto;max-width:300px;padding:6px;border-bottom:#aaa 1px dashed;word-break:break-all;}</style>\r\n';
     string = string + '\r\n<table style="margin:5% auto;">\r\n';
   }
   return string;
@@ -42,7 +43,7 @@ logger.accessLogHead = () => {
 logger.acccessLogBody = (access) => {
   let string = '<tr>';
   for (let item in access) {
-    string = string + '<td style="max-width:150px;padding:6px;border-bottom:#aaa 1px dashed;text-align:right;">' + item + ':</td><td style="max-width:275px;word-break:break-all;padding:6px;border-bottom:#aaa 1px dashed;text-align:left;">' + access[item] + '</td>';
+    string = string + '<td>' + item + ':</td><td>' + access[item] + '</td>';
   }
   string = string + '</tr>\r\n';
   return string;

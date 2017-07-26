@@ -12,7 +12,7 @@ buffer.intervalClear = setInterval(() => {
       logOnConsole({ name: 'Buffer', content: `Clear expired buffer "${path}"`, logLevel: 5 });
     }
   });
-}, config.server.BufferTime);
+}, (config.server.BufferTime || 10000) + 10000);
 
 buffer.readRes = (path, charset, alwaysReload, lifeTime) => {
   charset = charset || config.server.Charset;
@@ -59,6 +59,8 @@ buffer.writeMem = (path, data) => {
     expireTime: (new Date()).getTime() + config.server.BufferTime,
     data: data,
   };
+  logOnConsole({ name: 'Buffer', content: `Write to buffer "${path}"`, logLevel: 5 });
+  return data;
 }
 
 module.exports = buffer;

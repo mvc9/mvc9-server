@@ -16,7 +16,7 @@ router.toResFolder = (domain, vhostList) => {
 router.toRes = (pathname, rootPath, routeConfig) => {
   const regExpPath = new RegExp('/([^\\/]+/)+');
   const regExpSuffix = new RegExp('[^\\.]+$')
-  const pathSplit = (pathname.match(regExpPath) || [])[0];
+  const pathSplit = (pathname.match(regExpPath) || [])[0] || '/';
   const paths = pathname.split(pathSplit);
   const target = paths[paths.length - 1] || 'index';
   const targetSuffix = target.match(regExpSuffix) || [];
@@ -31,11 +31,6 @@ router.toRes = (pathname, rootPath, routeConfig) => {
     if (resLink.target.match(new RegExp(`\\.${routeConfig.controllerSuffix}`))) {
       resLink.type = 'controller';
     }
-    routeConfig.apiSuffix.map((apiMark, index) => {
-      if (resLink.targetSuffix === apiMark) {
-        resLink.type = 'api';
-      }
-    });
   } else {
     resLink.type = 'page';
   }
@@ -48,14 +43,12 @@ router.loadRes = (resLink) => {
       resLink.charset = config.server.Charset;
       resLink.targetSuffix = 'html';
       resLink.target === '/' ?
-      resLink.target = `\\index.${config.route.pageSuffix}` : resLink.target = `${resLink.target}.${config.route.pageSuffix}`;
+      resLink.target = `index.${config.route.pageSuffix}` : resLink.target = `${resLink.target}.${config.route.pageSuffix}`;
     case 'file':
       resLink.charset = resLink.charset || config.server.FileCharset;
-      const fileData = modules.buffer.readRes(`${resLink.rootPath}${resLink.target}`, resLink.charset);
+      const fileData = modules.buffer.readRes(`${resLink.rootPath}${resLink.path}${resLink.target}`, resLink.charset);
       return fileData === false ? false : fileData;
       break;
-    case 'api':
-      return true;
     case 'controller':
       return false;
   }

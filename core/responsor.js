@@ -38,26 +38,50 @@ module.exports = (request, response) => {
     }
   }
 
-  switch (responseLink.type) {
-    case 'api':
-    case 'page':
-      break;
+  const doResponse = () => {
+    response.set('X-Date-Time', (new Date()).toLocaleString());
+    response.set('X-Powered-By', config.server.ServerName);
+    response.type(responseLink.targetSuffix);
+    response.status(comparse.status).send(responseContent);
+    response.end();
+
+    comparse.timeCost = (new Date()).getTime() - timeStamp;
+
+    logOnConsole({
+      name: 'HTTP',
+      content: `STATUS ${comparse.status} | ${comparse.method.toUpperCase()} ${comparse.url} | ${comparse.clientAddress} | ${comparse.timeCost}ms`,
+      logLevel: 2
+    });
+    modules.logger.log(modules.logger.acccessLogBody(comparse));
   }
 
-  response.set('X-Date-Time', (new Date()).toLocaleString());
-  response.set('X-Powered-By', config.server.ServerName);
-  response.type(responseLink.targetSuffix);
-  response.status(comparse.status).send(responseContent);
-  response.end();
-
-  comparse.timeCost = (new Date()).getTime() - timeStamp;
-
-  logOnConsole({
-    name: 'HTTP',
-    content: `STATUS ${comparse.status} | ${comparse.method.toUpperCase()} ${comparse.url} | ${comparse.clientAddress} | ${comparse.timeCost}ms`,
-    logLevel: 2
-  });
-  modules.logger.log(modules.logger.acccessLogBody(comparse));
-
+  switch (responseLink.type) {
+    default:
+      doResponse();
+      break;
+    case 'page':
+      const controllerFullPath = `${responseLink.rootPath}${responseLink.path}${responseLink.target}.${config.route.controllerSuffix}`;
+      const hasController = fileSystem.existsSync(controllerFullPath);
+      if (hasController) {
+        const compileBuffered = modules.buffer.readMem(`${controllerFullPath}.compile`);
+        if (!compileBuffered) {
+          const doCompile = new Promise((resolve, reject) => {
+            const controller = require(controllerFullPath);
+            resolve(controller(responseContent));
+          }).then((content) => {
+            responseContent = modules.buffer.writeMem(`${controllerFullPath}.compile`, content);
+            doResponse();
+          }).catch(() => {
+            responseContent = modules.buffer.writeMem(`${controllerFullPath}.compile`, responseponseErrorPage(webrootPath, 500));
+            doResponse();
+          });
+          return;
+        } else {
+          responseContent = compileBuffered;
+        }
+      }
+      doResponse();
+      break;
+  }
   // response.send(`vhostresponsePath: ${vhostresponsePath}<br />responseLink: ${JSON.stringify(responseLink)}<br />responseDataLength: ${responseData ? responseData.length : -1}`);
 }
