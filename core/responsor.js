@@ -83,5 +83,4 @@ module.exports = (request, response) => {
       doResponse();
       break;
   }
-  // response.send(`vhostresponsePath: ${vhostresponsePath}<br />responseLink: ${JSON.stringify(responseLink)}<br />responseDataLength: ${responseData ? responseData.length : -1}`);
 }
