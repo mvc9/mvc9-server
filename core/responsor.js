@@ -67,7 +67,13 @@ module.exports = (request, response) => {
         if (!compileBuffered) {
           const doCompile = new Promise((resolve, reject) => {
             const controller = require(controllerFullPath);
-            resolve(controller(responseContent));
+            const control = {
+              lib: modules,
+              request: comparse,
+              path: `${responseLink.rootPath}${responseLink.path}$`,
+              file: responseLink.target
+            };
+            resolve(controller(control, responseContent));
           }).then((content) => {
             responseContent = modules.buffer.writeMem(`${controllerFullPath}.compile`, content);
             doResponse();

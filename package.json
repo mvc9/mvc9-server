@@ -2,7 +2,7 @@
   "name": "mvc9webserver",
   "version": "0.9.1",
   "description": "mvc9 web server(express + mvc9.js)",
-  "main": "/core/core.js",
+  "main": "core/core.js",
   "scripts": {
     "start": "node launchServer.js"
   },
