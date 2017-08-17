@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html>
+
+<head x-include="component/head.tpl" x-render="head">
+</head>
+
+<body>
+  <div class="main-rect" style="padding:10px;border:#ccc 1px dashed;">
+    <div class="navi" style="padding:10px;border:#ccc 1px dashed;" x-include="component/nav.tpl" x-render="nav"></div>
+    <div class="content" x-render="content" style="padding:10px;border:#ccc 1px dashed;">
+      <p>hello world</p>
+      <p>now time: {{(new Date()).toISOString()}}</p>
+    </div>
+    <div class="foot" x-include="component/foot.tpl" style="padding:10px;border:#ccc 1px dashed;"></div>
+  </div>
+</body>
+
+</html>

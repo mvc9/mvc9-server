@@ -70,16 +70,21 @@ module.exports = (request, response) => {
             const control = {
               lib: modules,
               request: comparse,
-              path: `${responseLink.rootPath}${responseLink.path}$`,
+              path: `${responseLink.rootPath}${responseLink.path}`,
               file: responseLink.target
             };
             resolve(controller(control, responseContent));
           }).then((content) => {
             responseContent = modules.buffer.writeMem(`${controllerFullPath}.compile`, content);
             doResponse();
-          }).catch(() => {
+          }).catch((error) => {
             responseContent = modules.buffer.writeMem(`${controllerFullPath}.compile`, responseponseErrorPage(webrootPath, 500));
             doResponse();
+            logOnConsole({
+              name: 'CONTROLLER',
+              content: error,
+              logLevel: 2
+            });
           });
           return;
         } else {

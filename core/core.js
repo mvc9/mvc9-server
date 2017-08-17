@@ -5,18 +5,19 @@ global.express = require('express');
 global.server = express();
 global.compression = require('compression');
 global.fileStreamRotator = require('file-stream-rotator');
-global.logOnConsole = require('./printer').logOnConsole;
+global.logOnConsole = require('./consoleLog').logOnConsole;
 global.config = {};
 global.modules = {};
 global.startServer = () => {
   logOnConsole({ name: 'SERVER', content: 'Load modules ...', logLevel: 1 });
-  modules.logger = require('./logger');
-  modules.parser = require('./parser');
-  modules.vhost = require('./vhost');
-  modules.buffer = require('./buffer');
-  modules.router = require('./router');
-  modules.responsor = require('./responsor');
+  modules.logger = require('./requestLogger');
+  modules.parser = require('./requestParser');
+  modules.vhost = require('./virtualHost');
+  modules.buffer = require('./memoryBuffer');
+  modules.router = require('./resourceRouter');
+  modules.responsor = require('./requestResponsor');
   modules.logger.log(modules.logger.accessLogHead());
+  modules.virtualDom = require('./domConstructor');
 
   config.server.compressionOption = { level: config.server.CompressionLevel };
   config.server.EnableCompression ? server.use(compression(config.server.compressionOption)) : null;

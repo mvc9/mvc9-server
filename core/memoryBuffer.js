@@ -16,6 +16,7 @@ buffer.intervalClear = setInterval(() => {
 
 buffer.readRes = (path, charset, alwaysReload, lifeTime) => {
   charset = charset || config.server.Charset;
+  alwaysReload = alwaysReload || false;
   lifeTime = lifeTime || config.server.BufferTime;
   const loadFile = (path) => {
     const isResExist = fileSystem.existsSync(path);
@@ -40,23 +41,25 @@ buffer.readRes = (path, charset, alwaysReload, lifeTime) => {
   return bufferMemory[path].data;
 }
 
-buffer.readMem = (path) => {
+buffer.readMem = (path, time) => {
+  time = time || (new Date()).getTime();
   if (bufferMemory[path]) {
-    if (bufferMemory[path].expireTime > (new Date()).getTime()) {
+    if (bufferMemory[path].expireTime > time) {
       return bufferMemory[path].data
     }
   }
   return false;
 }
 
-buffer.writeMem = (path, data) => {
+buffer.writeMem = (path, data, lifeTime) => {
+  lifeTime = lifeTime || config.server.BufferTime;
   if (bufferMemory[path]) {
     delete bufferMemory[path].expireTime;
     delete bufferMemory[path].data;
     delete bufferMemory[path];
   }
   bufferMemory[path] = {
-    expireTime: (new Date()).getTime() + config.server.BufferTime,
+    expireTime: (new Date()).getTime() + lifeTime,
     data: data,
   };
   logOnConsole({ name: 'Buffer', content: `Write to buffer "${path}"`, logLevel: 5 });

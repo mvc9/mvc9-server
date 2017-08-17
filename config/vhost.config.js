@@ -25,10 +25,11 @@ vhostList.push({
 });
 
 vhostList.push({
-  Name: 'test',
-  Domain: 'test1.mvc9.com',
+  Name: 'tutorial',
+  Domain: '127.0.0.1',
+  Domain2: 'localhost',
   Port: 80,
-  RootFolder: 'vpn'
+  RootFolder: 'tutorial'
 });
 
 module.exports = vhostList;

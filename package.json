@@ -15,8 +15,9 @@
   "repository": "github.com/mvc9",
   "license": "MIT",
   "dependencies": {
-    "compression": "^1.6.2",
     "express": "^4.14.1",
-    "file-stream-rotator": "0.0.7"
+    "compression": "^1.6.2",
+    "file-stream-rotator": "0.0.7",
+    "jsdom": "^11.1.0"
   }
 }
