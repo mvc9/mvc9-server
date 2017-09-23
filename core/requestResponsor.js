@@ -24,7 +24,7 @@ module.exports = (request, response) => {
   }
 
   const webrootPath = `${config.rootDirectory}\\webroot`;
-  const vhostFolder = modules.router.toResFolder(comparse.host, config.vhost);
+  const vhostFolder = modules.router.toResFolder(comparse.domain, comparse.port, config.vhost);
   if (!vhostFolder) {
     responseContent = responseponseErrorPage(webrootPath, 403);
   } else {
@@ -71,7 +71,8 @@ module.exports = (request, response) => {
               lib: modules,
               request: comparse,
               path: `${responseLink.rootPath}${responseLink.path}`,
-              file: responseLink.target
+              file: responseLink.target,
+              response: response
             };
             resolve(controller(control, responseContent));
           }).then((content) => {
