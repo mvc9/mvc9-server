@@ -1,12 +1,13 @@
 const router = {};
 
-router.toResFolder = (domain, vhostList) => {
+router.toResFolder = (domain, port, vhostList) => {
+  const parsePort = parseInt(port.replace(':', ''));
   let folder = '';
   vhostList.map((vhost, index) => {
-    if (domain === vhost.Domain) {
+    if (domain === vhost.Domain && parsePort === vhost.Port) {
       folder = vhost.RootFolder;
     }
-    if (domain === vhost.Domain2) {
+    if (domain === vhost.Domain2 && parsePort === vhost.Port) {
       folder = vhost.RootFolder;
     }
   })

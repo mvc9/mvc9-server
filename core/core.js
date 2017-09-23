@@ -4,6 +4,7 @@ global.fileSystem = require('fs');
 global.express = require('express');
 global.server = express();
 global.compression = require('compression');
+global.bodyParser = require('body-parser');
 global.fileStreamRotator = require('file-stream-rotator');
 global.logOnConsole = require('./consoleLog').logOnConsole;
 global.config = {};
@@ -19,6 +20,7 @@ global.startServer = () => {
   modules.logger.log(modules.logger.accessLogHead());
   modules.virtualDom = require('./domConstructor');
 
+  server.use(bodyParser.json())
   config.server.compressionOption = { level: config.server.CompressionLevel };
   config.server.EnableCompression ? server.use(compression(config.server.compressionOption)) : null;
   config.server.portList = modules.vhost.getPortList(config.vhost);
