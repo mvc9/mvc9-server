@@ -37,7 +37,7 @@ router.toRes = (pathname, rootPath, routeConfig) => {
       resLink.type = 'controller';
     }
   } else {
-    Object.keys(routeConfig.redirect).map((matchKey) => {
+    Object.keys(routeConfig.redirect || {}).map((matchKey) => {
       const matchRegex = new RegExp(matchKey);
       if (matchRegex.test(pathname)) {
         resLink = matchPath(routeConfig.redirect[matchKey]);
