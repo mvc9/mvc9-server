@@ -5,13 +5,15 @@ module.exports = {
   Charset: 'UTF-8',
   // charset : UTF-8/GBK/GB2312/etc...
   FileCharset: 'base64',
+  // your web application root directory
+  WebRootDir: 'webApp',
   // server admin's email
   AdminEmail: 'null',
   // turn zlib gzip compression true/false
   EnableCompression: true,
-  // leve of zlib 0-9 (for example 0 disable, 1 faster, 8 normal, 9 best)
+  // level of zlib compression 0-9 (for example 0 disable, 1 faster, 8 normal, 9 best)
   CompressionLevel: 3,
-  // display error page such as "404" "500" "502", put false to turn off this option could improve the performance of server request.
+  // error page path under the WebRootDir, put null to turn off this option to improve the performance of server request
   ErrorPage: 'errorPages',
   // turn console server log true/false
   LogLevel: 6,
