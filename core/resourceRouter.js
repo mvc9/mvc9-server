@@ -15,24 +15,34 @@ router.toResFolder = (domain, port, vhostList) => {
 }
 
 router.toRes = (pathname, rootPath, routeConfig) => {
-  const regExpPath = new RegExp('/([^\\/]+/)+');
-  const regExpSuffix = new RegExp('[^\\.]+$')
-  const pathSplit = (pathname.match(regExpPath) || [])[0] || '/';
-  const paths = pathname.split(pathSplit);
-  const target = paths[paths.length - 1] || 'index';
-  const targetSuffix = target.match(regExpSuffix) || [];
-  let resLink = {
-    type: 'file',
-    rootPath: rootPath,
-    path: pathSplit,
-    target: target,
-    targetSuffix: targetSuffix[0]
-  };
+  const matchPath = (pathName) => {
+    const regExpPath = new RegExp('/([^\\/]+/)+');
+    const regExpSuffix = new RegExp('[^\\.]+$')
+    const pathSplit = (pathName.match(regExpPath) || [])[0] || '/';
+    const paths = pathName.split(pathSplit);
+    const target = paths[paths.length - 1] || 'index';
+    const targetSuffix = target.match(regExpSuffix) || [];
+    return {
+      type: 'file',
+      rootPath: rootPath,
+      path: pathSplit,
+      target: target,
+      targetSuffix: targetSuffix[0]
+    };
+  }
+
+  let resLink = matchPath(pathname);
   if (resLink.targetSuffix !== resLink.target) {
     if (resLink.target.match(new RegExp(`\\.${routeConfig.controllerSuffix}`))) {
       resLink.type = 'controller';
     }
   } else {
+    Object.keys(routeConfig.redirect).map((matchKey) => {
+      const matchRegex = new RegExp(matchKey);
+      if (matchRegex.test(pathname)) {
+        resLink = matchPath(routeConfig.redirect[matchKey]);
+      }
+    })
     resLink.type = 'page';
   }
   return resLink;

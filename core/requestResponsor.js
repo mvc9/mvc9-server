@@ -13,7 +13,7 @@ module.exports = (request, response) => {
   const responseponseErrorPage = (path, status) => {
     let pageDocument = '';
     if (config.server.ErrorPage) {
-      pageDocument = modules.buffer.readRes(`${path}\\${config.server.ErrorPage}\\${status}.${config.route.pageSuffix}`, null, false, config.server.BufferTime * 10);
+      pageDocument = modules.buffer.readRes(`${path}\\${config.server.ErrorPage}\\${status}`, null, false, config.server.BufferTime * 10);
     }
     responseLink = {
       type: 'error',
@@ -23,7 +23,7 @@ module.exports = (request, response) => {
     return pageDocument;
   }
 
-  const webrootPath = `${config.rootDirectory}\\webroot`;
+  const webrootPath = `${config.rootDirectory}\\${config.server.WebRootDir}`;
   const vhostFolder = modules.router.toResFolder(comparse.domain, comparse.port, config.vhost);
   if (!vhostFolder) {
     responseContent = responseponseErrorPage(webrootPath, 403);
@@ -66,11 +66,12 @@ module.exports = (request, response) => {
         const compileBuffered = modules.buffer.readMem(`${controllerFullPath}.compile`);
         if (!compileBuffered) {
           const doCompile = new Promise((resolve, reject) => {
-            const controller = require(controllerFullPath);
+            const controller = eval(modules.buffer.readRes(controllerFullPath));
             const control = {
               lib: modules,
               request: comparse,
               path: `${responseLink.rootPath}${responseLink.path}`,
+              rootPath: `${responseLink.rootPath}`,
               file: responseLink.target,
               response: response
             };

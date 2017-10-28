@@ -1,5 +1,5 @@
-module.exports = (c, content) => {
-  require('./lib/mvc9.js');
+(c, content) => {
+  const $x = eval(c.lib.buffer.readRes(`${c.rootPath}/lib/mvc9.js`));
   let docDom = c.lib.virtualDom(content);
 
   $x.init();
