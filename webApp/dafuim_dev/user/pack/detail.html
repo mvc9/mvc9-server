@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+<head x-include="components/head.tpl" x-render="head"></head>
+<body>
+<div class="main-rect">
+  <div class="head">
+    <div class="navi-rect" x-include="components/navi.tpl"></div>
+  </div>
+  <div class="main-body user-pack-detail" x-render="mainBody">
+    <div class="content-rect">
+      <div class="bread-brumb">
+        <span>封装</span>
+        <span>我的APP</span>
+        <span>{{appInfo.app_name}}</span>
+      </div>
+      <div class="content-body">
+        <div class="work-pannel-head">
+          <div class="title">{{appInfo.app_name}}</div>
+        </div>
+        <div class="detail-box">
+          <div class="base-box">
+            <div class="base-info fl">
+              <div class="app-icon fl">
+                <img x-src="appInfo.icon_path" />
+              </div>
+              <div class="app-info fl">
+                <div class="app-name">
+                  <span class="name fl">{{appInfo.app_name}}</span>
+                  <span class="device-mark">{{CONSTANT.APPDEVICE[m.appInfo.device] + '版本'}}</span>
+                </div>
+                <div class="clear-both"></div>
+                <div class="app-version-size">
+                  <span>版本：{{appInfo.app_version}}</span>
+                  <span>大小：{{appInfo.app_size || '18MB'}}</span>
+                </div>
+                <div class="app-create-time">
+                  创建时间：{{appInfo.packed_at}}
+                </div>
+              </div>
+            </div>
+            <div class="operate-pannel fr">
+              <button class="btn btn-n01" x-if="">修改</button>
+              <a href="//wpa.qq.com/msgrd?v=3&uin=3261682395&site=qq&menu=yes" target="_blank">
+                <button class="btn btn-n02" x-if="{{String(m.appInfo.device) === '2'}}">购买签名</button>
+              </a>
+            </div>
+          </div>
+          <div class="table-box-rect">
+            <div class="line-box">
+              <div class="box fl">
+                <div class="sub-title">封装地址</div>
+                <div class="sub-content">{{appInfo.app_url}}</div>
+              </div>
+              <div class="box fl">
+                <div class="sub-title">过期时间</div>
+                <div class="sub-content">{{appInfo.expired_time}}</div>
+              </div>
+              <div class="box fl">
+                <div class="sub-title">测试下载地址</div>
+                <div class="sub-content" x-if="{{m.appInfo.issue_time != 0 && m.appInfo.is_unshelve != 1}}">
+                  <span class="icon-qrcode">
+                    <span class="iconfont">&#xe669;</span>
+                    <div class="hover-qrcode">
+                      <div class="notice">扫描二维码下载</div>
+                      <div class="qrcode">
+                        <img class="qrcode-img" qrcode-applink="{{m.appInfo.app_id}}" />
+                        <img class="inject-icon" x-src="m.appInfo.icon_path" />
+                      </div>
+                    </div>
+                  </span>
+                </div>
+                <div class="sub-content" x-if="{{m.appInfo.is_unshelve == 1}}">已过期</div>
+              </div>
+            </div>
+            <div class="line-box">
+              <div class="box fl">
+                <div class="sub-title">包名</div>
+                <div class="sub-content">{{appInfo.package_name || 'no.package.name'}}</div>
+              </div>
+              <div class="box fl">
+                <div class="sub-title">MD5值</div>
+                <div class="sub-content">{{appInfo.app_md5 || 'c481a727ff2b5035'}}</div>
+              </div>
+              <div class="box fl">
+                <div class="sub-title">剩余原始包下载</div>
+                <div class="sub-content" x-if="{{m.appInfo.down_time != 0 && m.appInfo.is_unshelve != 1}}">{{m.appInfo.down_time}}</div>
+                <div class="sub-content" x-if="{{m.appInfo.is_unshelve == 1}}">已过期</div>
+                <div class="down-origin" x-if="{{m.appInfo.down_time != 0 && m.appInfo.is_unshelve != 1}}">
+                  <a href="{{appInfo.app_path}}" target="_blank">
+                    <button class="btn btn-n02">下载原始包</button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot" x-include="components/foot.tpl"></div>
+</div>
+</body>
+</html>

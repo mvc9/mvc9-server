@@ -1,0 +1,106 @@
+.foot {
+  background-color: #4d4d4d;
+  color: #fff;
+  width: 100%;
+  padding: 45px 0;
+  position: relative;
+}
+.foot-wrap {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  .foot-menu {
+    .foot-menu-list {
+      display: inline-block;
+      width: 70%;
+      .foot-menu-list-box {
+        display: inline-block;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        min-width: 120px;
+        .list-title {
+          font-size: 18px;
+          margin-bottom: 8px;
+          .iconfont {
+            margin-right: 3px;
+          }
+          .order-us {
+            .order-us-icon {
+              font-size: 36px;
+            }
+          }
+        }
+        ul {
+          min-width: 100px;
+          float: left;
+          li {
+            margin: 4px 0;
+          }
+        }
+      }
+      .foot-box-split-column-r {
+        padding-right: 12%;
+        float: left;
+        + div {
+          padding-left: 30px;
+          border-left: #757575 1px solid;
+          box-shadow: -1px 0 0 #3c3c3c;
+        }
+      }
+    }
+    .qrcode-rect {
+      padding-top: 30px;
+      margin-left: 20px;
+    }
+    .foot-menu-qrcode-focus {
+      display: inline-table;
+      margin-right: 20px;
+      .iconfont {
+        font-size: 56px;
+      }
+    }
+    .foot-menu-qrcode-wx {
+      display: inline-table;
+      position: relative;
+      .pretend-wx-icon {
+        padding: 8px 10px;
+        margin-top: 2px;
+        background-color: #4eab43;
+        border-radius: 5px;
+        display: inline-block;
+      }
+      .foot-wx-icon {
+        position: absolute;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 5px;
+        display: none;
+        margin-top: -285px;
+        margin-left: -70px;
+        border: rgba(20, 20, 20, 0.2) 1px solid;
+      }
+      .qrcode-text {
+        text-align: center;
+        line-height: 24px;
+      }
+    }
+    .foot-menu-qrcode-wx:hover {
+      display: inline-table;
+      .foot-wx-icon {
+        display: inline-block;
+      }
+    }
+  }
+  .co-info {
+    margin-top: 30px;
+    padding-top: 20px;
+    text-align: center;
+    a {
+      color: #fff;
+    }
+  }
+  .foot-box-split-row-t {
+    border-top: #757575 1px solid;
+    box-shadow: 0 -1px 0 #333;
+  }
+}

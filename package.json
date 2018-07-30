@@ -1,0 +1,35 @@
+{
+  "name": "dafu.im.ssr",
+  "version": "1.0.0",
+  "description": "dafu.im web front(server side render)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node launchServer.js",
+    "dev": "gulp dev",
+    "build": "gulp build",
+    "eslint": "gulp eslint"
+  },
+  "keywords": [
+    "dafu",
+    "nodejs",
+    "webserver"
+  ],
+  "author": "dafu.im",
+  "repository": "hidden",
+  "license": "PROTECTED",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "compression": "^1.6.2",
+    "express": "^4.14.1",
+    "file-stream-rotator": "0.0.7",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-clean-css": "^3.9.3",
+    "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^4.0.2",
+    "gulp-sass": "^4.0.1",
+    "gulp-uglify": "^3.0.0",
+    "gulp-watch": "^5.0.0",
+    "jsdom": "^11.1.0"
+  }
+}

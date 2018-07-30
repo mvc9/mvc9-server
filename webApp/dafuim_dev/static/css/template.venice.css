@@ -1,0 +1,253 @@
+.wrapper {
+  padding: 6.4rem 0 1.6rem;
+  color: #666;
+  font-size: .373rem;
+  background: #011b55 url('../images/venice/bg.png') no-repeat 50% 0 / contain;
+}
+.container {
+  position: relative;
+  width: 8.53rem;
+  margin: auto;
+  padding: .64rem .373rem;
+  background: #fff;
+  border-radius: .29em;
+}
+.app-title {
+  float: right;
+  width: 4.53rem;
+  font-size: .53rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.app-icon {
+  float: left;
+  width: 2.66rem;
+  margin-left: .29rem;
+}
+.app-icon img {
+  display: block;
+}
+.app-info {
+  position: absolute;
+  z-index: 0;
+  top: 1.64rem;
+  left: 3.65rem;
+  color: #999;
+  font-size: .347rem;
+  line-height: 1.5;
+}
+.app-download-info {
+  clear: both;
+  width: 7.467rem;
+  margin: 0 auto .56rem;
+  padding-top: .8rem;
+}
+.app-download-pwd {
+  clear: both;
+  padding: .8rem 0;
+  text-align: center;
+}
+.download-btn {
+  display: none;
+}
+.app-system {
+  position: relative;
+  height: 1.867rem;
+  background: url('../images/venice/btn_download.png') no-repeat 50% 0 / cover;
+}
+.app-system p {
+  text-align: center;
+  line-height: 1.46rem;
+}
+.app-system .icon {
+  display: inline-block;
+  height: .8rem;
+  width: .8rem;
+  margin-right: .13rem;
+  vertical-align: middle;
+}
+.app-system span {
+  display: inline-block;
+  font-size: .48rem;
+  vertical-align: middle;
+}
+.app-system a {
+  color: #fff;
+  text-decoration: none;
+}
+.android .icon {
+  background: url('../images/venice/android.png') no-repeat 50% 0 / cover;
+}
+.ios .icon {
+  background: url('../images/venice/ios.png') no-repeat 50% 0 / cover;
+}
+.app-intro-item {
+  margin-bottom: .8rem;
+}
+.app-intro-item h2 {
+  margin-bottom: .373rem;
+  font-size: .48rem;
+}
+.app-intro-item .icon {
+  display: inline-block;
+  height: .533rem;
+  width: .533rem;
+  margin-right: .1rem;
+  vertical-align: middle;
+  background: url('../images/venice/coin.png') no-repeat 50% 0 / cover;
+}
+.app-intro-item p {
+  text-indent: 2em;
+  color: #999;
+  font-size: .4rem;
+}
+.qc-code {
+  position: relative;
+  margin-bottom: .213rem;
+  padding: .907rem 0;
+  text-align: center;
+}
+.qc-code::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  background-image: -webkit-linear-gradient(90deg, #fff 0%, #d0d0d0 50%, #fff 100%);
+  background-image: linear-gradient(90deg, #fff 0%, #d0d0d0 50%, #fff 100%);
+}
+.qc-code::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  background-image: -webkit-linear-gradient(90deg, #fff 0%, #d0d0d0 50%, #fff 100%);
+  background-image: linear-gradient(90deg, #fff 0%, #d0d0d0 50%, #fff 100%);
+}
+.qc-code a {
+  color: #3c6adc;
+  text-decoration: none;
+}
+.qc-code-save {
+  margin-bottom: .48rem;
+}
+.qc-code-copy span {
+  display: inline-block;
+  margin-bottom: .133rem;
+}
+.app-download-pwd input, .qc-code-copy input {
+  height: .8rem;
+  margin-right: .2rem;
+  padding: .133rem 0 .187rem .133rem;
+  border: none;
+  color: #666;
+  background: #eee;
+  font-size: .347rem;
+}
+.app-download-pwd input {
+  width: 3rem;
+}
+.qc-code-copy input {
+  width: 5.9rem;
+}
+.app-download-pwd a, .qc-code-copy a {
+  display: inline-block;
+  height: .8rem;
+  text-align: center;
+  line-height: .8rem;
+  color: #3c6adc;
+  background: #eee;
+  border-radius: .053rem;
+  vertical-align: middle;
+}
+.app-download-pwd a {
+  width: 2rem;
+}
+.qc-code-copy a {
+  width: 1.65rem;
+}
+.report-btn, .submit-btn {
+  display: block;
+  height: 1.067rem;
+  width: 2.88rem;
+  margin: .533rem auto;
+  border: none;
+  color: #3c6adc;
+  font-size: .373rem;
+  background: #eee;
+  border-radius: .54rem;
+}
+.footer a {
+  color: #3c6adc;
+  text-decoration: none;
+}
+.notice {
+  text-align: center;
+}
+.modal {
+  top: 10%;
+  max-height: 90%;
+  left: .72rem;
+  right: .72rem;
+  font-size: .373rem;
+  background: #fff;
+  border-radius: .3rem;
+  overflow: auto;
+}
+.modal h2 {
+  position: relative;
+  height: 1.2rem;
+  padding-left: .427rem;
+  line-height: 1.2rem;
+  font-size: .427rem;
+  border-bottom: 1px solid #eee;
+}
+.modal-close, .modal-close:hover {
+  position: absolute;
+  top: 0;
+  right: .427rem;
+  font-size: .5rem;
+  line-height: 1.1rem;
+  color: #999;
+  text-decoration: none;
+}
+.modal-form {
+  padding: .427rem;
+}
+.modal-form p {
+  margin-bottom: .427rem;
+}
+.input-text {
+  width: 100%;
+  padding: .187rem;
+  border: none;
+  color: #666;
+  background: #eee;
+  font-size: 100%;
+}
+.required {
+  margin-right: .1rem;
+  color: #f00;
+  font-style: normal;
+}
+.error-tip {
+  padding: .16rem;
+  color: #666;
+  background: #fdece8;
+  border: 1px solid #fbd9d0;
+}
+.submitting, .reported {
+  padding: .427rem .427rem .8rem;
+}
+.submitting p, .reported h3 {
+  line-height: 2;
+  text-align: center;
+}
+.reported p {
+  line-height: 1.5;
+  color: #999;
+}

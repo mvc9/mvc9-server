@@ -1,0 +1,132 @@
+.navi-rect {
+  width: 100%;
+  box-shadow: 1px 0 1px rgba(20, 20, 20, 0.3);
+  background-color: #fff;
+}
+.navi-bar {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 1200px;
+  height: 90px;
+  .navi {
+    display: inline-block;
+    height: 100%;
+  }
+  .logo {
+    float: left;
+    position: relative;
+    height: 100%;
+    margin-right: 32px;
+    img {
+      position: relative;
+      top: 50%;
+      margin-top: -19px;
+    }
+  }
+  ul.navi-links {
+    display: inline-block;
+    li {
+      float: left;
+      font-size: 14px;
+      text-align: center;
+      a {
+        line-height: 88px;
+        display: inline-block;
+        padding: 0 25px;
+        cursor: pointer;
+        transition: color,border 200ms ease-in-out;
+        border-bottom: transparent 2px solid;
+      }
+    }
+    li.current {
+      a {
+        color: #2d8cf0;
+        border-color: #2d8cf0;
+      }
+    }
+    li:hover {
+      a {
+        color: #2d8cf0;
+        border-color: #2d8cf0;
+      }
+    }
+  }
+  .login-box {
+    height: 100%;
+    float: right;
+    * {
+      margin-top: 29px;
+      margin-right: 5px;
+    }
+  }
+  .login-info {
+    height: 100%;
+    float: right;
+    //span {
+    //  display: inline-block;
+    //  margin-top: 35px;
+    //  margin-right: 5px;
+    //}
+  }
+  .user-info {
+    margin-top: 35px;
+    .user-info-menu {
+      display: inline-block;
+      position: relative;
+      padding-right: 20px;
+      cursor: pointer;
+      transition: border-color,color 200ms ease-in-out;
+      border-bottom: transparent 2px solid;
+      &:hover {
+        border-bottom: #2d8cf0 2px solid;
+        color: #2d8cf0;
+        .menu-drap-down {
+          display: inline-block;
+        }
+      }
+      .menu-arrow {
+        width: 0;
+        height: 0;
+        right: 0;
+        top: 8px;
+        display: inline-block;
+        border-width: 4px;
+        border-style: solid;
+        border-color: transparent;
+        border-top-color: #999;
+        position: absolute;
+      }
+      .menu-drap-down {
+        width: 113px;
+        margin-top: 2px;
+        margin-left: -1px;
+        display: none;
+        border-radius: 3px;
+        border: #dadada 1px solid;
+        box-shadow: 0 0 12px rgba(30, 30, 30, 0.2);
+        position: absolute;
+        background-color: #fff;
+        z-index: 200;
+        padding: 3px 0;
+        ul li {
+          a {
+            width: 100%;
+            display: inline-block;
+            line-height: 30px;
+            font-size: 12px;
+            text-indent: 30px;
+            color: #777;
+            cursor: pointer;
+          }
+          a:hover {
+            color: #2d8cf0;
+          }
+          & + li {
+            border-top: #f1f1f1 1px solid;
+          }
+        }
+      }
+    }
+  }
+}

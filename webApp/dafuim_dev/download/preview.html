@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+<head x-include="components/head.tpl" x-render="head"></head>
+<body>
+  <div class="main-rect-mobile pack-preview-page">
+    <div class="main-body" x-render="content">
+      <div class="title-box">{{app.app_name || '&nbsp;'}}</div>
+      <div class="icon-box">
+        <div class="icon-rect">
+          <img x-if="{{app.icon_link}}" x-event="icon-click" {{'src="' + m.app.icon_link + '"'}} />
+        </div>
+      </div>
+      <div class="download-box">
+        <a x-if="{{app.app_link}}" href="{{app.app_link}}">
+          <button class="btn btn-n01 btn-download">点击安装</button>
+        </a>
+        <div>
+          <div class="device-match">适用于&nbsp;{{deviceList[m.app.device - 1].join('和')}}</div>
+        </div>
+      </div>
+      <div class="info-rect">
+        <div class="info">版本：{{app.app_version}}{{app.app_size ? '&nbsp;&nbsp;大小：' + m.app.app_size : ''}}&nbsp;&nbsp;{{app.packed_at}}</div>
+        <div class="qrcode-tip">用手机扫描下面的二维码安装</div>
+        <div class="qrcode">
+          <img class="qrcode-image" x-qrcode="qrcode1" />
+          <img class="qrcode-icon" x-if="{{app.icon_link}}" {{'src="' + m.app.icon_link + '"'}} />
+        </div>
+        <div class="download-qrcode">
+          <div class="download-qrcode-link link" x-event="down-qrcode" target="_blank">下载高清二维码</div>
+        </div>
+        <!--<div class="browser-url-tip">-->
+          <!--或用手机浏览器输入网址: {{location.origin + location.pathname}}<a class="copy-btn link" data-clipboard-text="{{location.origin + location.pathname}}">复制</a>-->
+        <!--</div>-->
+      </div>
+      <div class="preview-foot">
+        <div class="foot-description-1">
+          大福是应用内测平台，请自行甄别应用风险，如应用存在问题，可点击“举报”按钮
+          <!--&nbsp;&nbsp;<button class="btn btn-n01 small report">举报</button>-->
+        </div>
+        <div class="disclaimer">
+          <a class="link" href="/aboutus/disclaimer" target="_blank">免责声明</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,296 @@
+
+/* global */
+@font-face {
+  font-family: 'iconfont';
+  src: url('/src/iconfont.eot');
+  src: url('/src/iconfont.eot?#iefix') format('embedded-opentype'),
+  url('/src/iconfont.woff') format('woff'),
+  url('/src/iconfont.ttf') format('truetype'),
+  url('/src/iconfont.svg#iconfont') format('svg');
+}
+
+.iconfont {
+  font-family: "iconfont", "sans-serif" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Microsoft YaHei UI', 'Microsoft YaHei', 'Helvetica', 'sans-serif';
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  color: #464C5B;
+  visibility: hidden; // !在JS启动之前不展示未渲染的HTML
+  * {
+    cursor: default;
+    :focus {
+      outline: none;
+    }
+  }
+  ul {
+    padding: 0;
+    margin: 0;
+    li {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+  }
+  a {
+    color: #666;
+    text-decoration: none;
+    &.link {
+      color: #00f;
+      cursor: pointer;
+    }
+  }
+  img {
+    margin: 0;
+    padding: 0;
+    border: none;
+    line-height: 0;
+  }
+}
+
+/* fast styles */
+.clear-both {
+  width: 0;
+  height: 0;
+  clear: both;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
+}
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.inline {
+  display: inline;
+}
+
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+.color-red {
+  color: #f00;
+}
+
+/* common styles */
+.main-rect {
+  min-width: 1200px;
+  width: 100%;
+  background-color: #f1f1f1;
+  .main-body {
+    min-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    .content-rect {
+      width: 1200px;
+      min-height: 400px;
+      margin: 30px auto;
+    }
+    .content-body {
+      width: 100%;
+      min-height: 100px;
+      margin-top: 25px;
+      background-color: #fff;
+      border-radius: 8px;
+      border: #dadada 1px solid;
+    }
+  }
+  // 面包屑导航
+  .bread-brumb {
+    height: 20px;
+    padding-left: 2px;
+    font-size: 14px;
+    color: #666;
+    span {
+      float: left;
+    }
+    span + span:before {
+      content: '/';
+      color: #ccc;
+      margin: 0 15px;
+    }
+  }
+  a.clickble {
+    color: #556786;
+    cursor: pointer;
+    &:hover {
+      color: #348DEE;
+    }
+  }
+}
+
+.main-rect-mobile {
+  width: 100%;
+  .main-body {
+    width: 100%;
+    max-width: 768px;
+    margin: 0 auto;
+  }
+}
+
+// 段落缩进2字符
+p.paragraph {
+  text-indent: 2em;
+}
+// 按钮基本样式
+.btn {
+  cursor: pointer;
+  box-sizing: content-box;
+  transition: all 200ms ease-in-out;
+  padding: 10px 15px 8px 15px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 12px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  border: transparent 1px solid;
+}
+
+.btn-n01 {
+  background-color: #2d8cf0;
+  color: #fff;
+}
+
+.btn-n01.small {
+  min-width: 20px;
+  padding: 6px 12px;
+  background-color: #2d8cf0;
+  color: #fff;
+}
+
+.btn-n01:hover {
+  background-color: #57a3f3;
+}
+
+.btn-n02 {
+  background-color: #fcfcfc;
+  color: #495060;
+  border-color: #dddee1;
+}
+
+.btn-n02:hover {
+  color: #2d8cf0;
+  border-color: #2d8cf0;
+}
+
+.slide {
+  position: relative;
+  overflow: hidden;
+  ul {
+    width: 99999px;
+    li {
+      float: left;
+      height: auto;
+    }
+  }
+}
+
+.qrcode {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: #fff;
+  .qrcode-img {
+    width: 100%;
+    height: 100%;
+  }
+  .inject-background {
+    position: absolute;
+    background-color: #fff;
+    width: 26%;
+    height: 26%;
+    left: 37%;
+    top: 37%;
+    border-radius: 8px;
+  }
+  .inject-icon {
+    position: absolute;
+    width: 22%;
+    height: 22%;
+    left: 39%;
+    top: 39%;
+    border-radius: 8px;
+    border: #fff 3px solid;
+  }
+}
+
+body .ui-modal {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  opacity: 0;
+  background-color: rgba(30, 30, 30, 0.3);
+  transition: opacity 300ms ease-in-out;
+  &.popup {
+    opacity: 1;
+  }
+  .modal-dialog-window {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 0 18px rgba(30, 30, 30, 0.3);
+    .modal-content {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+  }
+  .modal-title {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 16px;
+    position: relative;
+    .close-btn {
+      right: 8px;
+      cursor: pointer;
+      position: absolute;
+    }
+  }
+  .modal-inner-content {
+    margin: 10px 25px;
+  }
+  .modal-foot {
+    width: 100%;
+    height: 45px;
+    bottom: 0;
+    position: absolute;
+    text-align: center;
+    button {
+      width: 58px;
+      margin: 0 5px;
+      padding: 8px 15px 6px 15px;
+    }
+  }
+  .confirm,.message {
+    .modal-inner-content {
+      text-align: center;
+    }
+  }
+}
