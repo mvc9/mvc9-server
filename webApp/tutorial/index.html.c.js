@@ -20,7 +20,7 @@
       (op, m) => {
         // 渲染head部分
         m.m.jsFilePath = 'index';
-        $x.mapNode.compile('head');
+        $x.mapNode.render('head');
         c.response.set('token', 'QWERTYUIOP-1234567890X-1'); // you can set header like this
         op.next();
       },

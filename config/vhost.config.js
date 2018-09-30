@@ -17,18 +17,18 @@
 const vhostList = [];
 
 vhostList.push({
-  Name: 'dafu.im',
+  Name: 'demo',
   Domain: '127.0.0.1',
   Domain2: 'localhost',
-  Port: 8000,
-  RootFolder: 'dafuim'
+  Port: 8001,
+  RootFolder: 'demo'
 });
 
 vhostList.push({
   Name: 'tutorial',
   Domain: '127.0.0.1',
   Domain2: 'localhost',
-  Port: 8001,
+  Port: 8002,
   RootFolder: 'tutorial'
 });
 

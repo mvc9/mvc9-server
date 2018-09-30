@@ -6,7 +6,7 @@
 
 <body>
   <div class="main-rect" style="padding:10px;border:#ccc 1px dashed;">
-    <div class="navi" style="padding:10px;border:#ccc 1px dashed;" x-include="component/nav.tpl" x-render="nav"></div>
+    <div class="navi" style="padding:10px;border:#ccc 1px dashed;" x-render="nav" x-include="component/nav.tpl"></div>
     <div class="content" x-render="content" style="padding:10px;border:#ccc 1px dashed;">
       <p>hello world</p>
       <p>now time: {{(new Date()).toISOString()}}</p>

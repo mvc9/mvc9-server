@@ -4,8 +4,8 @@
   /* init $mvc object */
   var root = {};
   var $mvc = {
-    "name": "mvc9.js(mvc9.com)",
-    "version": "1.3.0",
+    "name": "mvc9.es5.js",
+    "build": 100000,
     "logLevel": 0
   };
 
@@ -19,6 +19,7 @@
   var removeEventListenerApi = 'removeEventListener';
   var listenerApiPrefix = '';
   var browserInitFlag = false;
+  var onloadQueue = [];
 
   $mvc.browser = {};
   $mvc.browser.H5Support = Boolean(root.applicationCache);
@@ -75,15 +76,16 @@
     }
   }
 
-  /*=====  example httpCom(AJAX)  =====*/
-  $mvc.httpComSequence = [];
+  /*=====  example XHR(AJAX)  =====*/
+  $mvc.XHRSequence = [];
   /*  @description single AJAX request.
    *  @param {Object} param
    *  @return {Object} param
    *
-   *  *** how to use $mvc.httpCom ***
+   *  *** how to use $mvc.XHR ***
    *
-   *  var param = { * "name": 'request1',
+   *  var param = {
+   *      "name": 'request1',
    *      "url": 'www.mvc9.com/api/1',
    *      "method": 'GET',
    *      "header": { "framework": "mvc9" },
@@ -94,10 +96,10 @@
    *      "preventDuration": 100 // (ms) { after request finished 100 ms, unlock this requset. },
    *      "then": function(status, response) { * your code * } *
    *  }; 
-   *  $mvc.httpCom(param);
+   *  $mvc.XHR(param);
    */
 
-  $mvc.httpCom = function (param) {
+  $mvc.XHR = function (param) {
     var xmlHttp = null;
     xmlHttp = GetXmlHttpObject();
     if (xmlHttp === null) {
@@ -105,16 +107,29 @@
       return;
     }
     param = {
-      "name": param.name || 'null',
-      "url": param.url || window.location.href,
+      "name": param.name || param.url,
+      "url": param.url || '',
       "method": param.method || 'GET',
       "header": param.header || {},
       "contentType": param.contentType || 'application/x-www-form-urlencoded',
       "content": param.content || '',
       "async": !!param.async || true,
       "preventDuration": param.preventDuration || 100,
-      "onPrevented": param.onPrevented || function (name) { console.warn('httpCom(name:' + name + ') is canceled because of an unfinished httpCom request with same name!'); },
+      "onPrevented": param.onPrevented || function (name) { console.warn('XHR(name:' + name + ') is canceled because of an unfinished XHR request with same name!'); },
       "then": param.then || function () {}
+    }
+
+    if (!param.url) {
+      console.error('XHR: param.url can not be omitted!');
+      return;
+    } else {
+      for (var m = 0; m < $mvc.XHRSequence.length; m++) {
+        if ($mvc.XHRSequence[m] === param.name && param.preventDuration) {
+          param.onPrevented(param.name);
+          return;
+        }
+      }
+      $mvc.XHRSequence.push(param.name);
     }
 
     param.header['Content-Type'] = param.contentType;
@@ -138,26 +153,16 @@
         }
       }
     }
-    if (!param.name) {
-      console.error('$mvc.httpCom param.name can not be omitted!');
-      return;
-    } else {
-      for (var m = 0; m < $mvc.httpComSequence.length; m++) {
-        if ($mvc.httpComSequence[m] === param.name) {
-          param.onPrevented(param.name);
-          return;
-        }
-      }
-      $mvc.httpComSequence.push(param.name);
-    }
 
     function stateChanged() {
       if (xmlHttp.readyState === 4) {
-        for (var queueIndex = 0; queueIndex < $mvc.httpComSequence.length; queueIndex++) {
-          setTimeout(function () {
-            $mvc.httpComSequence = $mvc.httpComSequence.slice(0, (queueIndex - 1)).concat($mvc.httpComSequence.slice(queueIndex, ($mvc.httpComSequence.length - 1)));
-          }, param.preventDuration);
-        }
+        setTimeout(function () {
+          for (var queueIndex = 0; queueIndex < $mvc.XHRSequence.length; queueIndex++) {
+            if ($mvc.XHRSequence[queueIndex] === param.name) {
+              $mvc.XHRSequence.splice(queueIndex, 1);
+            }
+          }
+        }, param.preventDuration);
         param.then(xmlHttp.status, xmlHttp.responseText);
       }
     }
@@ -193,7 +198,7 @@
   $mvc.regex = {};
   $mvc.regex.nodeMark = new RegExp('{{2,3}[^{}]*}{2,3}', 'g');
   $mvc.regex.scopePathMark = new RegExp('\\$path', 'g');
-  $mvc.regex.isReaptTier = new RegExp('\\$\\d+');
+  $mvc.regex.isRepeatTier = new RegExp('\\$\\d+');
 
   /*=====  Map Node MVC  =====*/
   $mvc.mapNode = {};
@@ -210,25 +215,25 @@
   /*  @description window.onload event
    *  @param {Function} fn
    */
-  $mvc.load = function (fn, autoCompile) {
-    var afterLoadFn = function (m) {
-      $mvc.browserInit();
-      fn(m);
-      if (autoCompile) {
-        for (var n = 0; n < $mvc.mapNode.molds.length; n++) {
-          $mvc.mapNode.compile($mvc.mapNode.molds[n].path);
-        }
-      }
-    };
-    window[addEventListenerApi](listenerApiPrefix + 'load', function () {
-      afterLoadFn(m);
-    });
+  $mvc.load = function (fn) {
+    if (!browserInitFlag) {
+      browserInitFlag = true;
+      window[addEventListenerApi](listenerApiPrefix + 'load', function () {
+        $mvc.browserInit(function () {
+          for (var n = 0; n < onloadQueue.length; n++) {
+            try {
+              onloadQueue[n](m);
+            } catch (err) {
+              throw new Error(err);
+            }
+          }
+        });
+      });
+    }
+    onloadQueue.push(fn);
   };
 
-  $mvc.browserInit = function () {
-    if (browserInitFlag) {
-      return;
-    }
+  $mvc.browserInit = function (callback) {
     if (window.addEventListener) {
       addEventListenerApi = 'addEventListener';
       removeEventListenerApi = 'removeEventListener';
@@ -238,15 +243,23 @@
       removeEventListenerApi = 'detachEvent';
       listenerApiPrefix = 'on';
     }
-    var styleElement = document.createElement('style');
-    styleElement.innerHTML = '*[x-if=false],*[x-if="0"],*[x-if=""],*[x-show=false],*[x-show="0"],*[x-show=""] { display: none!important }';
-    var headElement = document.getElementsByTagName('head');
-    headElement.length && headElement[0].appendChild(styleElement);
-    $mvc.mapNode.mapRenderToMold(document);
-    $mvc.mapNode.renderScopePath();
-    $mvc.mapNode.molds = [];
-    $mvc.mapNode.mapRenderToMold(document);
-    browserInitFlag = true;
+
+    $mvc.mapNode.mapIncludes({
+      resourceLoader: $mvc.mapNode.browserResourceLoader,
+      callback: function (rootNode) {
+        $mvc.mapNode.rootNode = rootNode
+        var styleElement = document.createElement('style');
+        styleElement.innerHTML = '*[x-if=false],*[x-if="0"],*[x-if=""],*[x-show=false],*[x-show="0"],*[x-show=""] { display: none!important }';
+        var headElement = document.getElementsByTagName('head');
+        headElement.length && headElement[0].appendChild(styleElement);
+
+        $mvc.mapNode.mapRenderToMold(rootNode);
+        $mvc.mapNode.renderScopePath();
+        $mvc.mapNode.molds = [];
+        $mvc.mapNode.mapRenderToMold(rootNode);
+        callback();
+      }
+    })
   };
 
   $mvc.nodeJSInit = function () {
@@ -328,16 +341,50 @@
     return attachDoms;
   };
 
-  $mvc.mapNode.mapIncludes = function (node, readResSync, pathPrefix) {
-    var matchTask = function (node, includePath, path) {
-      var includeHTML = readResSync(pathPrefix + includePath);
-      if (includeHTML !== false) {
-        node.innerHTML = includeHTML;
-        $mvc.mapNode.mapNodeByAttributeName(node, 'x-include', null, matchTask);
+  $mvc.mapNode.browserResourceLoader = function (url, callback) {
+    var onXHRLoadFinish = function (status, data) {
+      if ((/^[2-3]\d\d$/g).test(String(status))) {
+        callback(data);
+      } else {
+        callback('');
       }
     };
-    $mvc.mapNode.mapNodeByAttributeName(node, 'x-include', null, matchTask);
-    return node;
+    $mvc.XHR({
+      url: url,
+      then: onXHRLoadFinish,
+      preventDuration: 0,
+      onPrevented: onXHRLoadFinish
+    });
+  }
+
+  $mvc.mapNode.mapIncludes = function (param) {
+    var options = {
+      node: param.node || $mvc.mapNode.rootNode,
+      resourceLoader: param.resourceLoader || function () { throw new Error('mapIncludes: resourceLoader should be a function!') },
+      pathPrefix: param.cwd || '',
+      callback: param.callback || function () {}
+    };
+    var includes = [];
+    var mappedIncludes = 0;
+    var mapCallback = function () {
+      if (mappedIncludes === includes.length) {
+        options.callback(options.node);
+      }
+    }
+    var matchTask = function (node, includePath, path) {
+      options.resourceLoader(options.pathPrefix + includePath, function (includeHTML) {
+        mappedIncludes = mappedIncludes + 1;
+        if (includeHTML !== false) {
+          node.removeAttribute('x-include');
+          node.innerHTML = includeHTML;
+          $mvc.mapNode.mapNodeByAttributeName(node, 'x-include', null, matchTask);
+        }
+        includes.push($mvc.mapNode.mapNodeByAttributeName(node, 'x-include', null, matchTask));
+        mapCallback();
+      });
+    };
+    includes.push($mvc.mapNode.mapNodeByAttributeName(options.node, 'x-include', null, matchTask));
+    mapCallback();
   }
 
   $mvc.mapNode.nodeJSMapIncludes = function (node, readResSync, pathPrefix) {
@@ -363,7 +410,7 @@
       scopePath.push(renderScopeName);
       var pathString = scopePath.join('.');
       node.setAttribute('x-path', pathString);
-      !$mvc.regex.isReaptTier.test(renderScopeName) && !$mvc.mapNode.getMold(scopePath) && $mvc.mapNode.mold({ name: renderScopeName, node: node, path: scopePath, xPath: pathString});
+      !$mvc.regex.isRepeatTier.test(renderScopeName) && !$mvc.mapNode.getMold(scopePath) && $mvc.mapNode.mold({ name: renderScopeName, node: node, path: scopePath, xPath: pathString});
       $mvc.mapNode.mapNodeByAttributeName(node, 'x-render', scopePath, matchTask);
     }
     return $mvc.mapNode.mapNodeByAttributeName(node, 'x-render', [], matchTask);
@@ -389,8 +436,8 @@
       "nodeMarks": [],
       "nodeRepeats": [],
       "sourceHTML": param.node.innerHTML,
-      "beforeCompile": param.beforeCompile,
-      "afterCompile": param.afterCompile
+      "beforeRender": param.beforeRender,
+      "afterRender": param.afterRender
     });
   };
 
@@ -432,7 +479,7 @@
     return null;
   };
 
-  /*  @description Restore a compiled mvcNodeMold into marked html.
+  /*  @description Restore a rendered mvcNodeMold into marked html.
    *  @param {Object} mvcNodeMold
    *  @return {Object} mvcNodeMold
    */
@@ -448,48 +495,48 @@
     return nodeData;
   }
 
-  function doCompileEventByPathName(moldName, compileEventName) {
-    var compileEventFilter = new RegExp('(^|\\.)' + moldName + '(\\.|$)', 'g');
+  function doRenderEventByPathName(moldName, renderEventName) {
+    var renderEventFilter = new RegExp('(^|\\.)' + moldName + '(\\.|$)', 'g');
     var molds = $mvc.mapNode.molds;
     for (var n = 0; n < molds.length; n++) {
-      if (molds[n].xPath.match(compileEventFilter)) {
-        molds[n][compileEventName] && molds[n][compileEventName](m, molds[n]);
+      if (molds[n].xPath.match(renderEventFilter)) {
+        molds[n][renderEventName] && molds[n][renderEventName](m, molds[n]);
       }
     }
   }
 
-  /*  @description Compile a mvcNodeMold by reading window.* varable.
+  /*  @description Render a mvcNodeMold by reading window.* varable.
    *  @param {Object} mvcNodeMold
    *  @return {Object} mvcNodeMold
    */
-  $mvc.mapNode.compile = function (moldPath) {
-    var compiledNode;
+  $mvc.mapNode.render = function (moldPath) {
+    var renderedNode;
     $mvc.mapNode.getMold(moldPath, function (mold) {
-      $mvc.console('group', '$mvc compile', 5);
+      $mvc.console('group', '$mvc render', 5);
       $mvc.console('log', 'Mold Name : ' + mold.name, '#33f', 5);
       $mvc.console('log', 'Mold Path : ' + mold.path.join(' -> '), '#69f', 5);
       $mvc.console('log', 'Mold Element TagName : ' + mold.node.localName, '#69f', 5);
       $mvc.console('time', 'Elapsed Time');
       $mvc.console('log', 'Mold Element Class : ' + mold.node.className || 'null', '#69f', 5);
-      doCompileEventByPathName(mold.name, 'beforeCompile');
-      compiledNode = compile(mold.path, mold);
-      compiledNode = compileNodeSrc(compiledNode);
-      doCompileEventByPathName(mold.name, 'afterCompile');
+      doRenderEventByPathName(mold.name, 'beforeRender');
+      renderedNode = render(mold.path, mold);
+      renderedNode = renderNodeSrc(renderedNode);
+      doRenderEventByPathName(mold.name, 'afterRender');
       $mvc.console('log', 'Mold Repeats : ' + mold.nodeRepeats.length, '#69f', 5);
       $mvc.console('log', 'Mold Marks : ' + mold.nodeMarks.length, '#69f', 5);
       $mvc.console('timeEnd', 'Elapsed Time', 5);
-      $mvc.console('groupEnd', '$mvc compile', 5);
+      $mvc.console('groupEnd', '$mvc render', 5);
     });
-    return compiledNode || console.warn("cannot find renderScope mold by moldPath ['" + moldPath.join("','") + "']");
+    return renderedNode || console.warn("cannot find renderScope mold by moldPath ['" + moldPath.join("','") + "']");
   };
 
-  function compile(moldPath, nodeData, rootNode) {
+  function render(moldPath, nodeData, rootNode) {
     rootNode = rootNode || $mvc.mapNode.rootNode;
     nodeData.node = $mvc.mapNode.getElementsByAttributeName(rootNode, 'x-path', moldPath.join('.'))[0];
     restore(nodeData);
     nodeData = mapRepeatNode(nodeData);
     nodeData = filtNodeMarks(nodeData);
-    nodeData = compileNodeMarks(nodeData);
+    nodeData = renderNodeMarks(nodeData);
     $mvc.isNodeRuntime || $mvc.cleanXEventListeners();
     $mvc.isNodeRuntime && nodeData.node.removeAttribute('x-include');
     $mvc.isNodeRuntime && nodeData.node.removeAttribute('x-render');
@@ -497,7 +544,7 @@
     return nodeData;
   }
 
-  function getCompileMarkValue (markString, initalVaule) {
+  function getRenderMarkValue (markString, initalVaule) {
     var value = initalVaule || '';
     try {
       value = eval(markString)
@@ -522,17 +569,17 @@
       };
       nodeData.nodeRepeats.push(tempRepeat);
       var repeatTimes = 0;
-      var compileHTML = '';
-      var currentRepeatValue = getCompileMarkValue.call({} ,tempRepeat.repeatMark, []);
+      var renderHTML = '';
+      var currentRepeatValue = getRenderMarkValue.call({} ,tempRepeat.repeatMark, []);
       if (currentRepeatValue && typeof(currentRepeatValue) === 'object' && currentRepeatValue['concat']) {
         for (repeatTimes; repeatTimes < currentRepeatValue.length; repeatTimes++) {
           var tempHTML = tempRepeat.repeatHTML;
           tempHTML = tempHTML.replace(tierRegExp, repeatTimes);
-          compileHTML = compileHTML + tempHTML;
+          renderHTML = renderHTML + tempHTML;
         }
       }
       $mvc.isNodeRuntime && node.removeAttribute('x-repeat');
-      node.innerHTML = compileHTML;
+      node.innerHTML = renderHTML;
       $mvc.mapNode.mapNodeByAttributeName(node, 'x-repeat', tier + 1, matchTask);
     }
     nodeData.node = $mvc.mapNode.mapNodeByAttributeName(nodeData.node, 'x-repeat', 0, matchTask);
@@ -544,7 +591,7 @@
     return nodeData;
   }
 
-  function compileNodeMarks(nodeData) {
+  function renderNodeMarks(nodeData) {
     var htmlStr = nodeData.node.innerHTML;
     var mapedMarks = nodeData.nodeMarks;
     var mark3LRegex = new RegExp('{{{');
@@ -567,7 +614,7 @@
       tempMark = mapedMarks[i].replace(markFixRegex[0], '');
       tempMark = tempMark.replace(markFixRegex[1], '');
       tempMark = tempMark.replace(markFixRegex[4], '&');
-      tempMarkValue = getCompileMarkValue.call({}, tempMark, null);
+      tempMarkValue = getRenderMarkValue.call({}, tempMark, null);
       if (tempMarkValue !== undefined && tempMarkValue !== null) {
         tempStr = String(tempMarkValue);
         !isTrueElement && (tempStr = tempStr.replace(markFixRegex[2], '&#60;'));
@@ -581,11 +628,11 @@
     return nodeData;
   }
 
-  function compileNodeSrc(nodeData) {
+  function renderNodeSrc(nodeData) {
     var xSrcElements = $mvc.mapNode.getElementsByAttributeName(nodeData.node, 'x-src');
     for (var xSrcIndex = 0; xSrcIndex < xSrcElements.length; xSrcIndex ++) {
       var xSrcMark = xSrcElements[xSrcIndex].attributes['x-src'].value;
-      var xSrcValue = getCompileMarkValue.call({}, xSrcMark, '');
+      var xSrcValue = getRenderMarkValue.call({}, xSrcMark, '');
       if (xSrcValue !== undefined && xSrcValue !== null) {
         xSrcElements[xSrcIndex].setAttribute('src', xSrcValue);
       }
@@ -655,7 +702,7 @@
         queueMemory.lastError = err;
         queueMemory.errorCallBack && typeof(queueMemory.errorCallBack) === 'function' && queueMemory.errorCallBack(err);
         queueMemory.step += 1;
-        setTimeout(queueExecuter, 10, functionsQueue[queueMemory.step]);
+        setTimeout(queueExecuter, 1, functionsQueue[queueMemory.step]);
       }
     };
 
@@ -666,14 +713,14 @@
           queueFunc({
             next: function() {
               queueMemory.step += 1;
-              setTimeout(queueExecuter, 10, functionsQueue[queueMemory.step]);
+              setTimeout(queueExecuter, 1, functionsQueue[queueMemory.step]);
             },
             again: function() {
-              setTimeout(queueExecuter, 10, functionsQueue[queueMemory.step]);
+              setTimeout(queueExecuter, 1, functionsQueue[queueMemory.step]);
             },
             to: function(stepChange) {
               queueMemory.step = queueMemory.step + stepChange;
-              setTimeout(queueExecuter, 10, functionsQueue[queueMemory.step]);
+              setTimeout(queueExecuter, 1, functionsQueue[queueMemory.step]);
             },
             insertNext: function(queueFunc) {
               functionsQueue.splice(queueMemory.step + 1, 0, queueFunc);
@@ -700,14 +747,15 @@
       }
     };
     // async queue boot
-    setTimeout(queueExecuter, 10, functionsQueue[queueMemory.step]);
+    setTimeout(queueExecuter, 1, functionsQueue[queueMemory.step]);
     return queueMemory;
   };
+
+  typeof(module) !== 'undefined' && (module.exports = $mvc);
 
   if (!$mvc.isNodeRuntime) {
     root.$x = $mvc;
   } else {
-    module.exports = $mvc;
     return $mvc;
   }
 

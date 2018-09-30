@@ -4,8 +4,8 @@
   /* init $mvc object */
   var root = {};
   var $mvc = {
-    "name": "mvc9.js(mvc9.com)",
-    "version": "1.3.0",
+    "name": "mvc9.es5.js(mvc9.com)",
+    "version": "1.0.0",
     "logLevel": 0
   };
 
@@ -97,7 +97,7 @@
    *  $mvc.httpCom(param);
    */
 
-  $mvc.httpCom = function (param) {
+  $mvc.XHR = function (param) {
     var xmlHttp = null;
     xmlHttp = GetXmlHttpObject();
     if (xmlHttp === null) {
@@ -210,13 +210,13 @@
   /*  @description window.onload event
    *  @param {Function} fn
    */
-  $mvc.load = function (fn, autoCompile) {
+  $mvc.load = function (fn, autoRender) {
     var afterLoadFn = function (m) {
       $mvc.browserInit();
       fn(m);
-      if (autoCompile) {
+      if (autoRender) {
         for (var n = 0; n < $mvc.mapNode.molds.length; n++) {
-          $mvc.mapNode.compile($mvc.mapNode.molds[n].path);
+          $mvc.mapNode.render($mvc.mapNode.molds[n].path);
         }
       }
     };
@@ -389,8 +389,8 @@
       "nodeMarks": [],
       "nodeRepeats": [],
       "sourceHTML": param.node.innerHTML,
-      "beforeCompile": param.beforeCompile,
-      "afterCompile": param.afterCompile
+      "beforeRender": param.beforeRender,
+      "afterRender": param.afterRender
     });
   };
 
@@ -432,7 +432,7 @@
     return null;
   };
 
-  /*  @description Restore a compiled mvcNodeMold into marked html.
+  /*  @description Restore a rendered mvcNodeMold into marked html.
    *  @param {Object} mvcNodeMold
    *  @return {Object} mvcNodeMold
    */
@@ -448,48 +448,48 @@
     return nodeData;
   }
 
-  function doCompileEventByPathName(moldName, compileEventName) {
-    var compileEventFilter = new RegExp('(^|\\.)' + moldName + '(\\.|$)', 'g');
+  function doRenderEventByPathName(moldName, renderEventName) {
+    var renderEventFilter = new RegExp('(^|\\.)' + moldName + '(\\.|$)', 'g');
     var molds = $mvc.mapNode.molds;
     for (var n = 0; n < molds.length; n++) {
-      if (molds[n].xPath.match(compileEventFilter)) {
-        molds[n][compileEventName] && molds[n][compileEventName](m, molds[n]);
+      if (molds[n].xPath.match(renderEventFilter)) {
+        molds[n][renderEventName] && molds[n][renderEventName](m, molds[n]);
       }
     }
   }
 
-  /*  @description Compile a mvcNodeMold by reading window.* varable.
+  /*  @description Render a mvcNodeMold by reading window.* varable.
    *  @param {Object} mvcNodeMold
    *  @return {Object} mvcNodeMold
    */
-  $mvc.mapNode.compile = function (moldPath) {
-    var compiledNode;
+  $mvc.mapNode.render = function (moldPath) {
+    var renderedNode;
     $mvc.mapNode.getMold(moldPath, function (mold) {
-      $mvc.console('group', '$mvc compile', 5);
+      $mvc.console('group', '$mvc render', 5);
       $mvc.console('log', 'Mold Name : ' + mold.name, '#33f', 5);
       $mvc.console('log', 'Mold Path : ' + mold.path.join(' -> '), '#69f', 5);
       $mvc.console('log', 'Mold Element TagName : ' + mold.node.localName, '#69f', 5);
       $mvc.console('time', 'Elapsed Time');
       $mvc.console('log', 'Mold Element Class : ' + mold.node.className || 'null', '#69f', 5);
-      doCompileEventByPathName(mold.name, 'beforeCompile');
-      compiledNode = compile(mold.path, mold);
-      compiledNode = compileNodeSrc(compiledNode);
-      doCompileEventByPathName(mold.name, 'afterCompile');
+      doRenderEventByPathName(mold.name, 'beforeRender');
+      renderedNode = render(mold.path, mold);
+      renderedNode = renderNodeSrc(renderedNode);
+      doRenderEventByPathName(mold.name, 'afterRender');
       $mvc.console('log', 'Mold Repeats : ' + mold.nodeRepeats.length, '#69f', 5);
       $mvc.console('log', 'Mold Marks : ' + mold.nodeMarks.length, '#69f', 5);
       $mvc.console('timeEnd', 'Elapsed Time', 5);
-      $mvc.console('groupEnd', '$mvc compile', 5);
+      $mvc.console('groupEnd', '$mvc render', 5);
     });
-    return compiledNode || console.warn("cannot find renderScope mold by moldPath ['" + moldPath.join("','") + "']");
+    return renderedNode || console.warn("cannot find renderScope mold by moldPath ['" + moldPath.join("','") + "']");
   };
 
-  function compile(moldPath, nodeData, rootNode) {
+  function render(moldPath, nodeData, rootNode) {
     rootNode = rootNode || $mvc.mapNode.rootNode;
     nodeData.node = $mvc.mapNode.getElementsByAttributeName(rootNode, 'x-path', moldPath.join('.'))[0];
     restore(nodeData);
     nodeData = mapRepeatNode(nodeData);
     nodeData = filtNodeMarks(nodeData);
-    nodeData = compileNodeMarks(nodeData);
+    nodeData = renderNodeMarks(nodeData);
     $mvc.isNodeRuntime || $mvc.cleanXEventListeners();
     $mvc.isNodeRuntime && nodeData.node.removeAttribute('x-include');
     $mvc.isNodeRuntime && nodeData.node.removeAttribute('x-render');
@@ -497,7 +497,7 @@
     return nodeData;
   }
 
-  function getCompileMarkValue (markString, initalVaule) {
+  function getRenderMarkValue (markString, initalVaule) {
     var value = initalVaule || '';
     try {
       value = eval(markString)
@@ -522,17 +522,17 @@
       };
       nodeData.nodeRepeats.push(tempRepeat);
       var repeatTimes = 0;
-      var compileHTML = '';
-      var currentRepeatValue = getCompileMarkValue.call({} ,tempRepeat.repeatMark, []);
+      var renderHTML = '';
+      var currentRepeatValue = getRenderMarkValue.call({} ,tempRepeat.repeatMark, []);
       if (currentRepeatValue && typeof(currentRepeatValue) === 'object' && currentRepeatValue['concat']) {
         for (repeatTimes; repeatTimes < currentRepeatValue.length; repeatTimes++) {
           var tempHTML = tempRepeat.repeatHTML;
           tempHTML = tempHTML.replace(tierRegExp, repeatTimes);
-          compileHTML = compileHTML + tempHTML;
+          renderHTML = renderHTML + tempHTML;
         }
       }
       $mvc.isNodeRuntime && node.removeAttribute('x-repeat');
-      node.innerHTML = compileHTML;
+      node.innerHTML = renderHTML;
       $mvc.mapNode.mapNodeByAttributeName(node, 'x-repeat', tier + 1, matchTask);
     }
     nodeData.node = $mvc.mapNode.mapNodeByAttributeName(nodeData.node, 'x-repeat', 0, matchTask);
@@ -544,7 +544,7 @@
     return nodeData;
   }
 
-  function compileNodeMarks(nodeData) {
+  function renderNodeMarks(nodeData) {
     var htmlStr = nodeData.node.innerHTML;
     var mapedMarks = nodeData.nodeMarks;
     var mark3LRegex = new RegExp('{{{');
@@ -567,7 +567,7 @@
       tempMark = mapedMarks[i].replace(markFixRegex[0], '');
       tempMark = tempMark.replace(markFixRegex[1], '');
       tempMark = tempMark.replace(markFixRegex[4], '&');
-      tempMarkValue = getCompileMarkValue.call({}, tempMark, null);
+      tempMarkValue = getRenderMarkValue.call({}, tempMark, null);
       if (tempMarkValue !== undefined && tempMarkValue !== null) {
         tempStr = String(tempMarkValue);
         !isTrueElement && (tempStr = tempStr.replace(markFixRegex[2], '&#60;'));
@@ -581,11 +581,11 @@
     return nodeData;
   }
 
-  function compileNodeSrc(nodeData) {
+  function renderNodeSrc(nodeData) {
     var xSrcElements = $mvc.mapNode.getElementsByAttributeName(nodeData.node, 'x-src');
     for (var xSrcIndex = 0; xSrcIndex < xSrcElements.length; xSrcIndex ++) {
       var xSrcMark = xSrcElements[xSrcIndex].attributes['x-src'].value;
-      var xSrcValue = getCompileMarkValue.call({}, xSrcMark, '');
+      var xSrcValue = getRenderMarkValue.call({}, xSrcMark, '');
       if (xSrcValue !== undefined && xSrcValue !== null) {
         xSrcElements[xSrcIndex].setAttribute('src', xSrcValue);
       }
