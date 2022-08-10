@@ -1,5 +1,5 @@
 {
-  "name": "dafu.im.ssr",
+  "name": "mvc9-server",
   "version": "1.0.0",
   "description": "dafu.im web front(server side render)",
   "main": "server.js",
@@ -10,10 +10,14 @@
     "eslint": "gulp eslint"
   },
   "keywords": [
-    "dafu",
-    "nodejs",
-    "webserver"
+    "mvc9",
+    "server-side-render",
+    "webserver",
+    "nodejs"
   ],
+  "bin": {
+    "gulp": "./bin/gulp.js"
+  },
   "author": "dafu.im",
   "repository": "hidden",
   "license": "PROTECTED",
@@ -27,7 +31,7 @@
     "gulp-clean-css": "^3.9.3",
     "gulp-concat": "^2.6.1",
     "gulp-eslint": "^4.0.2",
-    "gulp-sass": "^4.0.1",
+    "gulp-less": "^5.0.0",
     "gulp-uglify": "^3.0.0",
     "gulp-watch": "^5.0.0",
     "jsdom": "^11.1.0"

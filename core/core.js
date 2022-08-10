@@ -1,27 +1,106 @@
 /* core */
 'use strict';
-global.fileSystem = require('fs');
-global.express = require('express');
-global.server = express();
-global.compression = require('compression');
-global.bodyParser = require('body-parser');
-global.fileStreamRotator = require('file-stream-rotator');
-global.logOnConsole = require('./consoleLog').logOnConsole;
-global.config = {};
-global.modules = {};
+const server = {};
+server.fileSystem = require('fs');
+server.express = require('express');
+server.server = express();
+server.expressMiddleWare = {};
+server.expressMiddleWare.compression = require('compression');
+server.expressMiddleWare.bodyParser = require('body-parser');
+server.fileStreamRotator = require('file-stream-rotator');
+server.config = null;
+
+server.modules = {
+  requestlogger: require('./request-logger'),
+  parser: require('./request-parser'),
+  vhost: require('./virtual-host'),
+  buffer: require('./memory-buffer'),
+  router: require('./resource-router'),
+  responsor: require('./request-responsor'),
+  virtualDom: require('./dom-provider')
+};
+
+server.logService = require('./log-service');
+
+server.fnHTTPBeforeStart = [];
+server.fnHTTPOnStart = [];
+server.fnHTTPAfterStart = [];
+
+server.fnWSBeforeStart = [];
+server.fnWSOnStart = [];
+server.fnWSAfterStart = [];
+
+
+server.beforeHTTPStart = (listener) => {
+  if (typeof(listener) !== 'function') {
+    server.logService.log({name: 'SERVER', content: 'beforeHTTPStart param listener should be a function!', level: 1})
+    return
+  }
+  server.fnHTTPBeforeStart.push(listener);
+};
+
+server.onHTTPStart = (listener) => {
+  if (typeof(listener) !== 'function') {
+    server.logService.log({name: 'SERVER', content: 'onHTTPStart param listener should be a function!', level: 1})
+    return
+  }
+  server.fnHTTPOnStart.push(listener);
+}
+
+server.afterHTTPStart = (listener) => {
+  if (typeof(listener) !== 'function') {
+    server.logService.log({name: 'SERVER', content: 'afterHTTPStart param listener should be a function!', level: 1})
+    return
+  }
+  server.fnHTTPAfterStart.push(listener);
+}
+
+
+
+server.beforeWSStart = (listener) => {
+  if (typeof(listener) !== 'function') {
+    server.logService.log({name: 'SERVER', content: 'beforeWSStart param listener should be a function!', level: 1})
+    return
+  }
+  server.fnWSBeforeStart.push(listener);
+};
+
+server.onWSStart = (listener) => {
+  if (typeof(listener) !== 'function') {
+    server.logService.log({name: 'SERVER', content: 'onWSStart param listener should be a function!', level: 1})
+    return
+  }
+  server.fnWSOnStart.push(listener);
+}
+
+server.afterWSStart = (listener) => {
+  if (typeof(listener) !== 'function') {
+    server.logService.log({name: 'SERVER', content: 'afterWSStart param listener should be a function!', level: 1})
+    return
+  }
+  server.fnWSAfterStart.push(listener);
+}
+
+server.beforeWSStart = (listener) => {}
+
+server.setLogService = (logService) => {}
+
+server.startHTTPServer = (config) => {
+  logOnConsole({ name: 'SERVER', content: 'server booting up...', logLevel: 1 });
+}
+
 global.startServer = () => {
-  logOnConsole({ name: 'SERVER', content: 'Load modules ...', logLevel: 1 });
-  modules.logger = require('./requestLogger');
-  modules.parser = require('./requestParser');
-  modules.vhost = require('./virtualHost');
-  modules.buffer = require('./memoryBuffer');
-  modules.router = require('./resourceRouter');
-  modules.responsor = require('./requestResponsor');
+  modules.logger = require('./request-logger');
+  modules.parser = require('./request-parser');
+  modules.vhost = require('./virtual-host');
+  modules.buffer = require('./memory-buffer');
+  modules.router = require('./resource-router');
+  modules.responsor = require('./request-responsor');
   modules.logger.log(modules.logger.accessLogHead());
-  modules.virtualDom = require('./domConstructor');
+  modules.virtualDom = require('./dom-provider');
 
   server.use(bodyParser.json({limit: '1024kb'}));
-  server.use(bodyParser.urlencoded({limit: '512mb', extended: true}));
+  server.use(bodyParser.urlencoded({limit: '4096kb', extended: true}));
   config.server.compressionOption = { level: config.server.CompressionLevel };
   config.server.EnableCompression ? server.use(compression(config.server.compressionOption)) : null;
   config.server.portList = modules.vhost.getPortList(config.vhost);
@@ -34,3 +113,6 @@ global.startServer = () => {
   modules.vhost.startListenPort(config.server.portList);
   logOnConsole({ name: 'SERVER', content: `Server is running up`, logLevel: 1 });
 };
+
+module.exports = server;
+export default server;

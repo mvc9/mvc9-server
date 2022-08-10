@@ -17,7 +17,7 @@ reqestParser.extract = (request) => {
       request.connection.remoteAddress ||
       request.socket.remoteAddress ||
       request.connection.socket.remoteAddress ||
-      ''
+      '-.-.-.-'
     )
     .match(/\d+\.\d+\.\d+\.\d+$/g) || ['unknown'])[0];
   reqParse['dateTime'] = (new Date((new Date()).getTime() - (new Date()).getTimezoneOffset() * 60000).toISOString()).replace('T', ' ');

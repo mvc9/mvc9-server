@@ -1,19 +1,9 @@
-const consoleLogger = {};
 
-consoleLogger.logOnConsole = (message) => {
-  let msg = {
-    name: message.name,
-    content: message.content,
-    logLevel: message.logLevel
-  }
-  if (msg.logLevel <= config.server.LogLevel) {
-    let contentHead;
-    msg.name ? contentHead = msg.name + ' :' : contentHead = 'LOG :';
-    console.log(contentHead, msg.content);
-  }
+const logService = {
+  logOnConsole: require('./console-log').logOnConsole
 };
 
-consoleLogger.unhandledPromiseRejection = process.on('unhandledRejection', (reason, promiseRefer) => {
+logService.unhandledPromiseRejection = process.on('unhandledRejection', (reason, promiseRefer) => {
   consoleLogger.logOnConsole({
     name:  'PROMISE REJECTION',
     content: "Unhandled Rejection at: Promise",
@@ -32,7 +22,7 @@ consoleLogger.unhandledPromiseRejection = process.on('unhandledRejection', (reas
   // application specific logging, throwing an error, or other logic here
 });
 
-consoleLogger.uncaughtException = process.on('uncaughtException', (error) => {
+logService.uncaughtException = process.on('uncaughtException', (error) => {
   consoleLogger.logOnConsole({
     name:  'ERROR EXCEPTION',
     content: "An exception caughted: ",
@@ -46,4 +36,8 @@ consoleLogger.uncaughtException = process.on('uncaughtException', (error) => {
   // application specific logging, throwing an error, or other logic here
 });
 
-module.exports = consoleLogger;
+logService.log = function (logItem) {
+  logService.logOnConsole(logItem);
+}
+
+module.exports = logService;
