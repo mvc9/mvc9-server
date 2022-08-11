@@ -1,7 +1,7 @@
 {
   "name": "mvc9-server",
   "version": "1.0.0",
-  "description": "dafu.im web front(server side render)",
+  "description": "mvc9 server",
   "main": "server.js",
   "scripts": {
     "start": "node launchServer.js",
@@ -25,7 +25,7 @@
     "body-parser": "^1.18.2",
     "compression": "^1.6.2",
     "express": "^4.14.1",
-    "file-stream-rotator": "0.0.7",
+    "express-ws": "^5.0.2",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^5.0.0",
     "gulp-clean-css": "^3.9.3",
