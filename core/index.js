@@ -1,7 +1,7 @@
 /* core */
 'use strict';
 
-export default function MVC9Server() {
+export default function MVC9Server(config) {
 
   const server = {};
   server.fileSystem = require('fs');
@@ -10,10 +10,10 @@ export default function MVC9Server() {
   server.expressMiddleWare = {};
   server.expressMiddleWare.compression = require('compression');
   server.expressMiddleWare.bodyParser = require('body-parser');
-  server.config = null;
+  server.logger = require('./log-service');
+  server.config = config;
   
   server.modules = {
-    requestlogger: require('./log-file-stream'),
     parser: require('./request-parser'),
     vhost: require('./virtual-host'),
     buffer: require('./memory-buffer'),
@@ -21,8 +21,6 @@ export default function MVC9Server() {
     responsor: require('./request-responsor'),
     htmlRender: require('./dom-provider')
   };
-  
-  server.logService = require('./log-service');
   
   server.fnHTTPBeforeStart = [];
   server.fnHTTPOnStart = [];
@@ -32,10 +30,9 @@ export default function MVC9Server() {
   server.fnWSOnStart = [];
   server.fnWSAfterStart = [];
   
-  
   server.beforeHTTPStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({name: 'SERVER', content: 'beforeHTTPStart param listener should be a function!', level: 1})
+      server.logger.log({msg: 'beforeHTTPStart param listener should be a function!'})
       return
     }
     server.fnHTTPBeforeStart.push(listener);
@@ -43,7 +40,7 @@ export default function MVC9Server() {
   
   server.onHTTPStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({name: 'SERVER', content: 'onHTTPStart param listener should be a function!', level: 1})
+      server.logger.log({msg: 'onHTTPStart param listener should be a function!'})
       return
     }
     server.fnHTTPOnStart.push(listener);
@@ -51,7 +48,7 @@ export default function MVC9Server() {
   
   server.afterHTTPStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({name: 'SERVER', content: 'afterHTTPStart param listener should be a function!', level: 1})
+      server.logService.log({msg: 'afterHTTPStart param listener should be a function!'})
       return
     }
     server.fnHTTPAfterStart.push(listener);
@@ -61,7 +58,7 @@ export default function MVC9Server() {
   
   server.beforeWSStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({name: 'SERVER', content: 'beforeWSStart param listener should be a function!', level: 1})
+      server.logService.log({msg: 'beforeWSStart param listener should be a function!'})
       return
     }
     server.fnWSBeforeStart.push(listener);
@@ -69,7 +66,7 @@ export default function MVC9Server() {
   
   server.onWSStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({name: 'SERVER', content: 'onWSStart param listener should be a function!', level: 1})
+      server.logService.log({msg: 'onWSStart param listener should be a function!'})
       return
     }
     server.fnWSOnStart.push(listener);
@@ -77,14 +74,14 @@ export default function MVC9Server() {
   
   server.afterWSStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({name: 'SERVER', content: 'afterWSStart param listener should be a function!', level: 1})
+      server.logService.log({msg: 'afterWSStart param listener should be a function!'})
       return
     }
     server.fnWSAfterStart.push(listener);
   }
   
   server.startHTTPServer = (config) => {
-    logOnConsole({ name: 'SERVER', content: 'server booting up...', logLevel: 1 });
+    logOnConsole({msg: 'server booting up...'});
     if (server.logService) {
       if (server.logService.isDefault) {
         server.beforeHTTPStart(function(server, next) {
@@ -96,28 +93,19 @@ export default function MVC9Server() {
   
   
   global.startServer = () => {
-    modules.logger = require('./log-file-stream');
-    modules.parser = require('./request-parser');
-    modules.vhost = require('./virtual-host');
-    modules.buffer = require('./memory-buffer');
-    modules.router = require('./resource-router');
-    modules.responsor = require('./request-responsor');
-    modules.logger.log(modules.logger.accessLogHead());
-    modules.virtualDom = require('./dom-provider');
   
-    server.use(bodyParser.json({limit: '1024kb'}));
-    server.use(bodyParser.urlencoded({limit: '4096kb', extended: true}));
+    server.server.use(bodyParser.json({limit: '1024kb'}));
+    server.server.use(bodyParser.urlencoded({limit: '4096kb', extended: true}));
     config.server.compressionOption = { level: config.server.CompressionLevel };
-    config.server.EnableCompression ? server.use(compression(config.server.compressionOption)) : null;
+    config.server.EnableCompression ? server.server.use(compression(config.server.compressionOption)) : null;
     config.server.portList = modules.vhost.getPortList(config.vhost);
   
-    server.locals.title = config.server.ServerName;
-    server.locals.email = config.server.AdminEmail;
-    server.all('/\**/', modules.responsor);
+    server.server.locals.title = config.server.ServerName;
+    server.server.all('/\**/', modules.responsor);
   
-    logOnConsole({ name: 'SERVER', content: 'Starting service ...', logLevel: 1 });
+    logOnConsole({ msg: 'Starting service ...'});
     modules.vhost.startListenPort(config.server.portList);
-    logOnConsole({ name: 'SERVER', content: `Server is running up`, logLevel: 1 });
+    logOnConsole({ msg: `Server is running up`});
   };
 
   return server;

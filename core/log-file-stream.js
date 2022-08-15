@@ -2,6 +2,8 @@
 function LoggerFileStream(server) {
   /* logger */
   const logger = {
+    fileName: null,
+    fileTimeStamp: 0,
     status: 0,
     logStream: null
   };
@@ -11,15 +13,23 @@ function LoggerFileStream(server) {
     fileSystem.existsSync(logDirectory) || fileSystem.mkdirSync(logDirectory);
   }
 
-  logger.getCurrentDate = (timezoneOffset = (new Date()).getTimezoneOffset()) => {
-    const date = (new Date((new Date()).getTime() - timezoneOffset * 60000));
+  logger.getCurrentDate = (dateObject, timezoneOffset = 0) => {
+    const date = (new Date((dateObject).getTime() - timezoneOffset * 60000));
     const pureTimeStr = date.toISOString().replace(/\.\d{0,3}(Z?)$/g, '');
     return pureTimeStr.replace(/[T\:]/g, '-').replace(/-/g, '_');
   }
 
-  logger.start = (logPath, fileName) => {
+  logger.start = (logPath, fileName, fileTimeStamp = (new Date()).getTime()) => {
+
     logger.status = 1;
-    logger.confirmWriteDirectory(logPath);
+    logger.fileTimeStamp = fileTimeStamp;
+
+    if (logPath) {
+      logger.confirmWriteDirectory(logPath);
+    }
+    if (fileName) {
+      logger.fileName = fileName;
+    }
     logger.logStream = server.fileSystem.createWriteStream(`${logPath}/${fileName}`, {flags: 'aw'});
   }
 
@@ -27,9 +37,11 @@ function LoggerFileStream(server) {
     logger.logStream.write(string)
   };
 
-  logger.finish = () => {
-    logger.status = 0;
-    logger.logStream.end();
+  logger.closeStream = () => {
+    if (logger.status !== 0) {
+      logger.status = 0;
+      logger.logStream.end();
+    }
   }
 
   logger.getFileStreamHandler = () => {
