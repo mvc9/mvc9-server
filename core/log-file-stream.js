@@ -1,5 +1,6 @@
 
-function LoggerFileStream(server) {
+function LogFileStream() {
+  const fileSystem = require('fs');
   /* logger */
   const logger = {
     fileName: null,
@@ -13,10 +14,12 @@ function LoggerFileStream(server) {
     fileSystem.existsSync(logDirectory) || fileSystem.mkdirSync(logDirectory);
   }
 
-  logger.getCurrentDate = (dateObject, timezoneOffset = 0) => {
-    const date = (new Date((dateObject).getTime() - timezoneOffset * 60000));
-    const pureTimeStr = date.toISOString().replace(/\.\d{0,3}(Z?)$/g, '');
-    return pureTimeStr.replace(/[T\:]/g, '-').replace(/-/g, '_');
+  logger.confirmWriteFile = (fullPath) => {
+    let fileInfo = { size: 0 };
+    try {
+      fileInfo = fileSystem.statSync(fullPath);
+    } catch (err) {}
+    return fileInfo.size;
   }
 
   logger.start = (logPath, fileName, fileTimeStamp = (new Date()).getTime()) => {
@@ -24,17 +27,27 @@ function LoggerFileStream(server) {
     logger.status = 1;
     logger.fileTimeStamp = fileTimeStamp;
 
+
     if (logPath) {
       logger.confirmWriteDirectory(logPath);
     }
     if (fileName) {
       logger.fileName = fileName;
     }
-    logger.logStream = server.fileSystem.createWriteStream(`${logPath}/${fileName}`, {flags: 'aw'});
+
+    const fileFullPath = `${logPath}/${fileName}.log`;
+    const startIndex = logger.confirmWriteFile(fileFullPath);
+    const writeFlag = startIndex ? 'a' : 'w'
+
+    logger.logStream = fileSystem.createWriteStream(fileFullPath, {flags: writeFlag, start: startIndex});
   }
 
   logger.log = (string) => {
-    logger.logStream.write(string)
+    if (logger.logStream) {
+      logger.logStream.write(string + '\r\n')
+    } else {
+      console.warn('write log failed as logStream not ready, content:\r\b', string)
+    }
   };
 
   logger.closeStream = () => {
@@ -51,7 +64,9 @@ function LoggerFileStream(server) {
   logger.getStatus = () => {
     return logger.logStream;
   }
+
+  return logger;
 }
 
 // exports the logger
-module.exports = logger;
+module.exports = LogFileStream;

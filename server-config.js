@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   // your server public name
   serverName: 'MVC9-Web-Server',
   // your server service name
@@ -9,6 +9,8 @@ export default {
   requestDebug: false,
   // global time zone setting, you can use (new Date()).getTimezoneOffset() to get your time zone offset.
   timezoneOffset: -480,
+  // server absolute base directory
+  baseDir: __dirname,
   // http config.
   http: {
     // port
@@ -31,10 +33,10 @@ export default {
   }],
   // logger config
   log: {
-    logOnConsole: false,
-    cLogPath: '/logs/c',
-    httpLogPath: '/logs/http',
-    wsLogPath: '/logs/ws',
-    errorLogPath: '/logs/error'
+    logOnConsole: true,
+    cLogPath: 'log/c',
+    httpLogPath: 'log/http',
+    wsLogPath: 'log/ws',
+    errorLogPath: 'log/error'
   }
 }

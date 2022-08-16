@@ -1,114 +1,121 @@
-/* core */
-'use strict';
+/* mvc9 index */
 
-export default function MVC9Server(config) {
+function MVC9Server(config, memo) {
 
-  const server = {};
-  server.fileSystem = require('fs');
-  server.express = require('express');
-  server.server = express();
-  server.expressMiddleWare = {};
-  server.expressMiddleWare.compression = require('compression');
-  server.expressMiddleWare.bodyParser = require('body-parser');
-  server.logger = require('./log-service');
-  server.config = config;
+  if (!config) {
+    throw new Error('MVC9Server constructor param config should not be empty!');
+  }
+
+  const mvc9 = {
+    memo: memo || {}
+  };
+  mvc9.config = config;
+  mvc9.fileSystem = require('fs');
+  mvc9.express = require('express');
+  mvc9.server = mvc9.express();
+  mvc9.expressMiddleWare = {};
+  mvc9.expressMiddleWare.compression = require('compression');
+  mvc9.expressMiddleWare.bodyParser = require('body-parser');
+
+
+  const LogService = require('./log-service');
+  mvc9.logger = new LogService(config);
   
-  server.modules = {
+  mvc9.modules = {
     parser: require('./request-parser'),
-    vhost: require('./virtual-host'),
-    buffer: require('./memory-buffer'),
     router: require('./resource-router'),
     responsor: require('./request-responsor'),
     htmlRender: require('./dom-provider')
   };
   
-  server.fnHTTPBeforeStart = [];
-  server.fnHTTPOnStart = [];
-  server.fnHTTPAfterStart = [];
+  mvc9.fnHTTPBeforeStart = [];
+  mvc9.fnHTTPOnStart = [];
+  mvc9.fnHTTPAfterStart = [];
   
-  server.fnWSBeforeStart = [];
-  server.fnWSOnStart = [];
-  server.fnWSAfterStart = [];
+  mvc9.fnWSBeforeStart = [];
+  mvc9.fnWSOnStart = [];
+  mvc9.fnWSAfterStart = [];
   
-  server.beforeHTTPStart = (listener) => {
+  mvc9.beforeHTTPStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logger.log({msg: 'beforeHTTPStart param listener should be a function!'})
+      mvc9.logger.log({msg: 'beforeHTTPStart param listener should be a function!'})
       return
     }
-    server.fnHTTPBeforeStart.push(listener);
+    mvc9.fnHTTPBeforeStart.push(listener);
   };
   
-  server.onHTTPStart = (listener) => {
+  mvc9.onHTTPStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logger.log({msg: 'onHTTPStart param listener should be a function!'})
+      mvc9.logger.log({msg: 'onHTTPStart param listener should be a function!'})
       return
     }
-    server.fnHTTPOnStart.push(listener);
+    mvc9.fnHTTPOnStart.push(listener);
   }
   
-  server.afterHTTPStart = (listener) => {
+  mvc9.afterHTTPStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({msg: 'afterHTTPStart param listener should be a function!'})
+      mvc9.logger.log({msg: 'afterHTTPStart param listener should be a function!'})
       return
     }
-    server.fnHTTPAfterStart.push(listener);
+    mvc9.fnHTTPAfterStart.push(listener);
   }
   
   
-  
-  server.beforeWSStart = (listener) => {
+  mvc9.beforeWSStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({msg: 'beforeWSStart param listener should be a function!'})
+      mvc9.logger.log({msg: 'beforeWSStart param listener should be a function!'})
       return
     }
-    server.fnWSBeforeStart.push(listener);
+    mvc9.fnWSBeforeStart.push(listener);
   };
   
-  server.onWSStart = (listener) => {
+  mvc9.onWSStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({msg: 'onWSStart param listener should be a function!'})
+      mvc9.logger.log({msg: 'onWSStart param listener should be a function!'})
       return
     }
-    server.fnWSOnStart.push(listener);
+    mvc9.fnWSOnStart.push(listener);
   }
   
-  server.afterWSStart = (listener) => {
+  mvc9.afterWSStart = (listener) => {
     if (typeof(listener) !== 'function') {
-      server.logService.log({msg: 'afterWSStart param listener should be a function!'})
+      mvc9.logger.log({msg: 'afterWSStart param listener should be a function!'})
       return
     }
-    server.fnWSAfterStart.push(listener);
+    mvc9.fnWSAfterStart.push(listener);
   }
   
-  server.startHTTPServer = (config) => {
-    logOnConsole({msg: 'server booting up...'});
-    if (server.logService) {
-      if (server.logService.isDefault) {
-        server.beforeHTTPStart(function(server, next) {
+  mvc9.startHTTPServer = (config) => {
+    mvc9.logger.log({msg: 'server booting up...'});
+    if (mvc9.logService) {
+      if (mvc9.logService.isDefault) {
+        mvc9.beforeHTTPStart(function(mvc9, next) {
           next();
         })
       }
     }
   }
   
+  mvc9.use = (plugin) => {
+    plugin(mvc9);
+  }
   
-  global.startServer = () => {
+  mvc9.start = () => {
+    mvc9.server.use(mvc9.expressMiddleWare.bodyParser.json({limit: '1024kb'}));
+    mvc9.server.use(mvc9.expressMiddleWare.bodyParser.urlencoded({limit: '4096kb', extended: true}));
+    config.http.compressionOption = { level: config.http.CompressionLevel };
+    config.http.EnableCompression ? server.server.use(compression(config.http.compressionOption)) : null;
   
-    server.server.use(bodyParser.json({limit: '1024kb'}));
-    server.server.use(bodyParser.urlencoded({limit: '4096kb', extended: true}));
-    config.server.compressionOption = { level: config.server.CompressionLevel };
-    config.server.EnableCompression ? server.server.use(compression(config.server.compressionOption)) : null;
-    config.server.portList = modules.vhost.getPortList(config.vhost);
-  
-    server.server.locals.title = config.server.ServerName;
-    server.server.all('/\**/', modules.responsor);
-  
-    logOnConsole({ msg: 'Starting service ...'});
-    modules.vhost.startListenPort(config.server.portList);
-    logOnConsole({ msg: `Server is running up`});
+    mvc9.server.locals.title = config.ServerName;
+    // mvc9.server.all('/\**/', modules.responsor);
+
+    mvc9.logger.log({ msg: 'Starting service ...'});
+    mvc9.server.listen(config.http.port, () => {
+      mvc9.logger.log({ msg: `Server listen on port ${config.http.port}`});
+    })
   };
 
-  return server;
+  return mvc9;
 }
 
 module.exports = MVC9Server;

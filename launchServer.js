@@ -1,8 +1,7 @@
 /* launchServer */
-require('./core/core');
+const Server = require('./core/index');
+const config = require('./server-config');
 config.rootDirectory = __dirname;
-config.vhost = require('./config/vhost.config');
-config.route = require('./config/route.config');
-config.server = require('./config/server.config');
 
-startServer();
+const app = new Server(config);
+app.start();
