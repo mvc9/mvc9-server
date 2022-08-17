@@ -16,10 +16,10 @@ router.toResFolder = (domain, port, vhostList) => {
 
 router.toRes = (pathname, rootPath, routeConfig) => {
   const matchPath = (pathName) => {
-    const pathnameNoParamRegex = new RegExp('^(/(?!p/)[^/]+)+', 'g')
-    const pathNameNoParam = (pathName.match(pathnameNoParamRegex) || ['/'])[0]
+    const pathnameNoParamRegex = new RegExp('^(/(?!p/)[^/]+)+', 'g');
+    const pathNameNoParam = (pathName.match(pathnameNoParamRegex) || ['/'])[0];
     const regExpPath = new RegExp('/([^\\/]+/)+');
-    const regExpSuffix = new RegExp('[^\\.]+$')
+    const regExpSuffix = new RegExp('[^\\.]+$');
     const pathSplit = (pathNameNoParam.match(regExpPath) || [])[0] || '/';
     const paths = pathNameNoParam.split(pathSplit);
     const target = paths[paths.length - 1] || 'index';

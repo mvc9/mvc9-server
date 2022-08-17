@@ -1,3 +1,6 @@
+/* document enviroment provider */
+
+// require dependency jsDom
 const jsDom = require('jsdom');
 
 const makeDocument = (htmlText) => {

@@ -10,7 +10,6 @@ function LogService(config) {
   const logService = {
     isDefault: true,    // this should be false or undefined if you use your own custom logService
     config: config,
-    logOnConsole: require('./console-log').logOnConsole,
     httpLogger: null,
     wsLogger: null,
     cLogger: null,
@@ -132,7 +131,7 @@ function LogService(config) {
         }
         
       }
-      const logMsgStr = `[${currentLogDate}]: ${msg}`;
+      const logMsgStr = `[${currentLogDate}]: ${msg.stack ? msg.stack : msg}`;
       if (logService.config.log.logOnConsole) {
         console.log(`[${currentLogDate}]:`, msg);
       }

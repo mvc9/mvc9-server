@@ -24,6 +24,7 @@ function MVC9Server(config, memo) {
   mvc9.modules = {
     parser: require('./request-parser'),
     router: require('./resource-router'),
+    defender: require('./defender'),
     responsor: require('./request-responsor'),
     htmlRender: require('./dom-provider')
   };
@@ -100,14 +101,14 @@ function MVC9Server(config, memo) {
     plugin(mvc9);
   }
   
-  mvc9.start = () => {
+  mvc9.bootup = () => {
     mvc9.server.use(mvc9.expressMiddleWare.bodyParser.json({limit: '1024kb'}));
     mvc9.server.use(mvc9.expressMiddleWare.bodyParser.urlencoded({limit: '4096kb', extended: true}));
     config.http.compressionOption = { level: config.http.CompressionLevel };
-    config.http.EnableCompression ? server.server.use(compression(config.http.compressionOption)) : null;
+    config.http.enableCompression ? mvc9.server.use(mvc9.expressMiddleWare.compression(config.http.compressionOption)) : null;
   
     mvc9.server.locals.title = config.ServerName;
-    // mvc9.server.all('/\**/', modules.responsor);
+    mvc9.server.all('/\**/', mvc9.modules.defender(mvc9, ()=>{}));
 
     mvc9.logger.log({ msg: 'Starting service ...'});
     mvc9.server.listen(config.http.port, () => {

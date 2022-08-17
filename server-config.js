@@ -22,15 +22,22 @@ module.exports = {
     // level of zlib compression 0-9 (for example 0 disable, 1 faster, 8 normal, 9 best).
     compressionLevel: 1,
     // error page path under the WebRootDir, put null to turn off this option to improve the performance of server request.
-    errorPage: 'errorPages',
-    // defend DDOS of Flood CC error request attack, use defendMode will disable all error response, such as 404.
-    defendMode: false
+    errorPage: 'errorPages'
   },
   // webSocket config
   webSocket: [{
     // it will use /$webRootDir/ws.c.js as the webSocket controller.
     wsUrlPath: '/ws'
   }],
+  defender: {
+    // defend DDOS of Flood CC error request attack, use defendMode will disable all error response, such as 404.
+    enable: true,
+    scanDuration: 10000,
+    accessListSize: 10000,
+    craftyListSize: 200,
+    deniedListSize: 200,
+    denyTime: 600000
+  },
   // logger config
   log: {
     logOnConsole: true,
