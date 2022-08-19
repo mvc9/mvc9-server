@@ -29,14 +29,21 @@ module.exports = {
     // it will use /$webRootDir/ws.c.js as the webSocket controller.
     wsUrlPath: '/ws'
   }],
+  // net service defender
   defender: {
-    // defend DDOS of Flood CC error request attack, use defendMode will disable all error response, such as 404.
-    enable: true,
-    scanDuration: 10000,
+    // defend Flood request attack, use defendMode will disable all error response, such as 404.
+    enabled: true,
+    scanDuration: 6000,
     accessListSize: 10000,
-    craftyListSize: 200,
-    deniedListSize: 200,
-    denyTime: 600000
+    deniedFrequency: 30,
+    denyTime: 600000,
+    whiteList: {
+      '127.0.0.1': 2000000000000,
+      '0.0.0.0': 2000000000000
+    },
+    blackList: {
+      '4.4.4.4': 2000000000000
+    }
   },
   // logger config
   log: {

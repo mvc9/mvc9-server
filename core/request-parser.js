@@ -15,13 +15,16 @@ httpInfo.getIP = (req) => {
 httpInfo.extract = (req) => {
   const info = {};
   info['method'] = req.method;
-  info['url'] = req.url;
   info['pathname'] = req._parsedUrl.pathname;
-  info['host'] = req.hostname || '';
-  // info['domain'] = (info['host'].match(/[^\:]+/) || [''])[0];
-  // info['port'] = (info['host'].match(/:[^\:]+$/) || [':80'])[0];
-  info['clientAddress'] = ((httpInfo.getIP(req)[0] || {addr: ''}).addr.match(/((\.)?\d{1,3}){4}/g) || ['unknown']) || [0];
-  // info['dateTime'] = (new Date((new Date()).getTime() - (new Date()).getTimezoneOffset() * 60000).toISOString()).replace('T', ' ');
+  info['url'] = req.originalUrl;
+  info['query'] = req.query || '';
+  info['protocol'] = req.protocol || '';
+  info['hostname'] = req.hostname || '';
+  info['host'] = req.get('host') || '';
+  info['IPs'] = httpInfo.getIP(req);
+  info['IP'] = info['IPs'][0];
+  info['IPv4'] = ((info['IP'] || {addr: ''}).addr.match(/((\.)?\d{1,3}){4}/g) || ['unknown'])[0];
+  info['IPv6'] = ((info['IP'] || {addr: ''}).addr.match(/^.*\:/g) || ['unknown'])[0];
   info['userAgent'] = req.headers['user-agent'];
   info['headers'] = req.headers;
   info['body'] = req.body;
@@ -35,9 +38,9 @@ httpInfo.generateReport = (request) => {
   string = string + '<body style="background-color:#f6f6f6;color:#666;font-size:13px;font-family:micorsoft yahei;Arial;helvetica">';
   string = string + '<table style="margin:5% auto;">';
   for (let item in req) {
-    string = string + '<tr><td style="max-width:300px;padding:6px;border-bottom:#aaa 1px dashed;">' + item + ':</td>'
+    string = string + '<tr><td style="max-width:300px;padding:6px;vertical-align:top;border-bottom:#aaa 1px dashed;">' + item + ':</td>'
       + '<td style="max-width:500px;word-break:break-all;padding:6px;border-bottom:#aaa 1px dashed;">'
-      + ((req[item].constructor && req[item].constructor.name) === 'Object' ? Object.keys(req[item]).map((key)=>{return `${key}: ${req[item][key]}<br />`}).join('') : req[item])
+      + ((req[item] && req[item].constructor && typeof(req[item])) === 'object' ? JSON.stringify(req[item], 0, 2) : req[item]);
       + '</td></tr>';
   }
   string = string + '</table>';
