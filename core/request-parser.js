@@ -34,7 +34,7 @@ httpInfo.extract = (req) => {
 httpInfo.generateReport = (request) => {
   const req = request;
   let string = '';
-  string = '<!doctype html><header><title>req Infomation</title><meta charset="utf-8"></header>';
+  string = '<!doctype html><header><title>Request Info</title><meta charset="utf-8"></header>';
   string = string + '<body style="background-color:#f6f6f6;color:#666;font-size:13px;font-family:micorsoft yahei;Arial;helvetica">';
   string = string + '<table style="margin:5% auto;">';
   for (let item in req) {

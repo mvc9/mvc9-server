@@ -40,8 +40,6 @@ module.exports = function defender (mvc9) {
         }
       }
       defender.accessList = [];
-      mvc9.logger.log({msg: `Defender Report: Normal access: ${defender.accessCount} times.`});
-      mvc9.logger.log({msg: `Defender Report: Defend attack: ${defender.defendCount} times.`});
     }, mvc9.defender.scanDuration);
   }
 
@@ -55,17 +53,17 @@ module.exports = function defender (mvc9) {
       param[key] = arguments[i];
     })
 
-    const reqInfo = requestParser.extract(param.req);
+    const IPAddr = requestParser.getIP(param.req)[0] || {addr: ''};
+    const clientIP = (IPAddr.addr.match(/((\.)?\d{1,3}){4}/g) || ['unknown'])[0];
 
     const defender = mvc9.defender;
 
     if (param.err && defender.enabled) {
       param.res.end();
     }
-
+    
     if (defender.enabled) {
       const nowTimeInt = (new Date()).getTime();
-      const clientIP = reqInfo['IPv4'];
       const white = defender.whiteList[clientIP];
       const black = defender.blackList[clientIP];
       if (white) {
@@ -94,7 +92,7 @@ module.exports = function defender (mvc9) {
     }
     
     defender.accessCount = defender.accessCount + 1;
-    param.req.reqInfo = reqInfo;
+    param.req.clientIPv4 = clientIP;
     param.res.removeHeader('X-Powered-By');
     param.next();
   }

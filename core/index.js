@@ -110,11 +110,22 @@ function MVC9Server(config, memo) {
     mvc9.server.use(mvc9.expressMiddleWare.bodyParser.urlencoded({limit: '4096kb', extended: true}));
     config.http.compressionOption = { level: config.http.CompressionLevel };
     config.http.enableCompression ? mvc9.server.use(mvc9.expressMiddleWare.compression(config.http.compressionOption)) : null;
-  
+    config.http.etag ? null : mvc9.server.disable('etag');
+
     mvc9.server.locals.title = config.ServerName;
     mvc9.server.all('/\**/', (req, res) => {
+      if (req.protocol === 'http' ) {
+        if (config.https.useHttpsOnly) {
+          if (config.https.port) {
+            const redirectUrl = `https://${req.hostname}${config.https.port === 443 ? '' : `:${config.https.port}`}${req.originalUrl}`;
+            res.status(301);
+            res.location(redirectUrl);
+            res.end();
+          }
+        }
+      }
       const requestParser = require('./request-parser');
-      res.send(requestParser.generateReport(req.reqInfo));
+      res.send(requestParser.generateReport(requestParser.extract(req)));
       res.end();
     });
 
