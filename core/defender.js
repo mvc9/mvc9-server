@@ -94,9 +94,8 @@ module.exports = function defender (mvc9) {
     }
     
     defender.accessCount = defender.accessCount + 1;
+    param.req.reqInfo = reqInfo;
     param.res.removeHeader('X-Powered-By');
-    param.res.send(requestParser.generateReport(reqInfo));
-    param.res.end();
     param.next();
   }
 

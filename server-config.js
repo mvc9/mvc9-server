@@ -13,7 +13,7 @@ module.exports = {
   baseDir: __dirname,
   // http config.
   http: {
-    // port
+    // http listen port, set port null or undefined to disable http listen
     port: 8000,
     // where your web service page controllers are.
     webRootDir: 'webApp',
@@ -23,6 +23,12 @@ module.exports = {
     compressionLevel: 1,
     // error page path under the WebRootDir, put null to turn off this option to improve the performance of server request.
     errorPage: 'errorPages'
+  },
+  https: {
+    port: 443,
+    useHttpsOnly: true,
+    certFile: 'certification/*.2enc.com.crt',
+    keyFile: 'certification/*.2enc.com.key'
   },
   // webSocket config
   webSocket: [{

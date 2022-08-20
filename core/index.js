@@ -1,5 +1,7 @@
 /* mvc9 index */
 
+const { https } = require('../server-config');
+
 function MVC9Server(config, memo) {
 
   if (!config) {
@@ -13,6 +15,7 @@ function MVC9Server(config, memo) {
   mvc9.fileSystem = require('fs');
   mvc9.express = require('express');
   mvc9.server = mvc9.express();
+  mvc9.https = require('https');
   mvc9.expressMiddleWare = {};
   mvc9.expressMiddleWare.compression = require('compression');
   mvc9.expressMiddleWare.bodyParser = require('body-parser');
@@ -109,14 +112,29 @@ function MVC9Server(config, memo) {
     config.http.enableCompression ? mvc9.server.use(mvc9.expressMiddleWare.compression(config.http.compressionOption)) : null;
   
     mvc9.server.locals.title = config.ServerName;
-    mvc9.server.all('/\**/', () => {
-      
+    mvc9.server.all('/\**/', (req, res) => {
+      const requestParser = require('./request-parser');
+      res.send(requestParser.generateReport(req.reqInfo));
+      res.end();
     });
 
-    mvc9.logger.log({ msg: 'Starting service ...'});
-    mvc9.server.listen(config.http.port, () => {
-      mvc9.logger.log({ msg: `Server listen on port ${config.http.port}`});
-    })
+    mvc9.logger.log({ msg: `Starting service "${config.serviceName}"...`});
+    if (config.http.port) {
+      mvc9.server.listen(config.http.port, () => {
+        mvc9.logger.log({ msg: `Server http listen on port ${config.http.port}`});
+      })
+    }
+
+    if (config.https.port) {
+      const httpsCert = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.certFile}`);
+      const httpsKey = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.keyFile}`);
+      mvc9.httpsServer = mvc9.https.createServer({cert: httpsCert, key: httpsKey}, mvc9.server);
+      mvc9.httpsServer.listen(config.https.port, () => {
+        mvc9.logger.log({ msg: `Server https listen on port ${config.https.port}`});
+      })
+    }
+
+    mvc9.s
   };
 
   return mvc9;
