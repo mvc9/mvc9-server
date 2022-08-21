@@ -90,7 +90,6 @@ module.exports = function defender (mvc9) {
         defender.accessList.push(clientIP);
       }
     }
-    
     defender.accessCount = defender.accessCount + 1;
     param.req.clientIPv4 = clientIP;
     param.res.removeHeader('X-Powered-By');

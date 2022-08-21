@@ -1,7 +1,5 @@
 /* mvc9 index */
 
-const { https } = require('../server-config');
-
 function MVC9Server(config, memo) {
 
   if (!config) {
@@ -16,6 +14,7 @@ function MVC9Server(config, memo) {
   mvc9.express = require('express');
   mvc9.server = mvc9.express();
   mvc9.https = require('https');
+  mvc9.ws = require('express-ws');
   mvc9.expressMiddleWare = {};
   mvc9.expressMiddleWare.compression = require('compression');
   mvc9.expressMiddleWare.bodyParser = require('body-parser');
@@ -105,6 +104,7 @@ function MVC9Server(config, memo) {
   }
   
   mvc9.bootup = () => {
+    mvc9.logger.log({ msg: `Starting service "${config.serviceName}"...`});
     mvc9.server.use(mvc9.modules.defender(mvc9));
     mvc9.server.use(mvc9.expressMiddleWare.bodyParser.json({limit: '1024kb'}));
     mvc9.server.use(mvc9.expressMiddleWare.bodyParser.urlencoded({limit: '4096kb', extended: true}));
@@ -113,8 +113,28 @@ function MVC9Server(config, memo) {
     config.http.etag ? null : mvc9.server.disable('etag');
 
     mvc9.server.locals.title = config.ServerName;
+
+    if (config.http.port) {
+      mvc9.ws(mvc9.server).app.ws('/\**/', (conn, req) => {
+        conn.send('hello!-ws');
+      }); 
+      mvc9.server.listen(config.http.port, () => {
+        mvc9.logger.log({ msg: `Server http listen on port ${config.http.port}`});
+      })
+    }
+
+    if (config.https.port) {
+      const httpsCert = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.certFile}`);
+      const httpsKey = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.keyFile}`);
+      mvc9.httpsServer = mvc9.https.createServer({cert: httpsCert, key: httpsKey}, mvc9.server);
+      mvc9.ws(mvc9.server, mvc9.httpsServer);
+      mvc9.httpsServer.listen(config.https.port, () => {
+        mvc9.logger.log({ msg: `Server https listen on port ${config.https.port}`});
+      });
+    }
+
     mvc9.server.all('/\**/', (req, res) => {
-      if (req.protocol === 'http' ) {
+      if (req.protocol === 'http') {
         if (config.https.useHttpsOnly) {
           if (config.https.port) {
             const redirectUrl = `https://${req.hostname}${config.https.port === 443 ? '' : `:${config.https.port}`}${req.originalUrl}`;
@@ -128,24 +148,6 @@ function MVC9Server(config, memo) {
       res.send(requestParser.generateReport(requestParser.extract(req)));
       res.end();
     });
-
-    mvc9.logger.log({ msg: `Starting service "${config.serviceName}"...`});
-    if (config.http.port) {
-      mvc9.server.listen(config.http.port, () => {
-        mvc9.logger.log({ msg: `Server http listen on port ${config.http.port}`});
-      })
-    }
-
-    if (config.https.port) {
-      const httpsCert = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.certFile}`);
-      const httpsKey = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.keyFile}`);
-      mvc9.httpsServer = mvc9.https.createServer({cert: httpsCert, key: httpsKey}, mvc9.server);
-      mvc9.httpsServer.listen(config.https.port, () => {
-        mvc9.logger.log({ msg: `Server https listen on port ${config.https.port}`});
-      })
-    }
-
-    mvc9.s
   };
 
   return mvc9;

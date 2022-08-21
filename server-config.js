@@ -29,39 +29,45 @@ module.exports = {
     // https listen port, set port null or undefined to disable https listen.
     port: 443,
     // if request is using http protocol, redirect it to https.
-    useHttpsOnly: true,
+    useHttpsOnly: false,
     // https cert file
     certFile: 'certification/*.2enc.com.crt',
     // https key file
     keyFile: 'certification/*.2enc.com.key'
   },
-  // webSocket config
-  webSocket: [{
-    // it will use /$webRootDir/ws.c.js as the webSocket controller.
-    wsUrlPath: '/ws'
-  }],
   // net service defender
   defender: {
     // defend Flood request attack, use defendMode will disable all error response, such as 404.
     enabled: true,
+    // defender scan interval time(ms) rate.
     scanDuration: 5000,
+    // how many access history stored to scan
     accessListSize: 10000,
+    // how many times in defender.scanDuration will trigger defend.
     deniedFrequency: 30,
+    // defender triggerd deny time(ms)
     denyTime: 100000,
+    // defender white list
     whiteList: {
       '127.0.0.1': 2000000000000,
       '0.0.0.0': 2000000000000
     },
+    // defender black list
     blackList: {
       '4.4.4.4': 2000000000000
     }
   },
   // logger config
   log: {
+    // print log on nodejs console
     logOnConsole: true,
+    // console log path
     cLogPath: 'log/c',
+    // http log path
     httpLogPath: 'log/http',
+    // ws log path
     wsLogPath: 'log/ws',
+    // critical error log path
     errorLogPath: 'log/error'
   }
 }
