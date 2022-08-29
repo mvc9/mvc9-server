@@ -1,4 +1,3 @@
-const { response } = require("express");
 
 module.exports = function (mvc9, serveType) {
   return (req, res) => {
@@ -16,9 +15,13 @@ module.exports = function (mvc9, serveType) {
           case 'controller':
             if (routeRes.data.name === 'reqControl') {
               req.reqInfo = reqInfo;
-              // routeRes.data(req, res);
-              res.status(505);
-              res.end();
+              try {
+                routeRes.data(req, res);
+              } catch (err) {
+                mvc9.logger.log({msg: err, type: -1});
+                res.status(505);
+                res.end();
+              }
             } else {
               mvc9.logger.log({msg: `Router: Wrong controller function name of url "${routePath}", request will return error 500.`, type: -1});
               res.status(500);
