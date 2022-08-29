@@ -59,9 +59,9 @@ module.exports = function defender (mvc9) {
     const defender = mvc9.defender;
 
     if (param.err && defender.enabled) {
-      param.res.end();
+      param.res.destroy();
     }
-    
+
     if (defender.enabled) {
       const nowTimeInt = (new Date()).getTime();
       const white = defender.whiteList[clientIP];

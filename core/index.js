@@ -27,7 +27,7 @@ function MVC9Server(config, memo) {
     parser: require('./request-parser'),
     router: require('./resource-router'),
     defender: require('./defender'),
-    responsor: require('./request-responsor'),
+    responsor: require('./request-response'),
     htmlRender: require('./dom-provider')
   };
   
@@ -105,6 +105,7 @@ function MVC9Server(config, memo) {
   
   mvc9.bootup = () => {
     mvc9.logger.log({ msg: `Starting service "${config.serviceName}"...`});
+    mvc9.server.locals.title = config.ServerName;
     mvc9.server.use(mvc9.modules.defender(mvc9));
     mvc9.server.use(mvc9.expressMiddleWare.bodyParser.json({limit: '1024kb'}));
     mvc9.server.use(mvc9.expressMiddleWare.bodyParser.urlencoded({limit: '4096kb', extended: true}));
@@ -112,25 +113,30 @@ function MVC9Server(config, memo) {
     config.http.enableCompression ? mvc9.server.use(mvc9.expressMiddleWare.compression(config.http.compressionOption)) : null;
     config.http.etag ? null : mvc9.server.disable('etag');
 
-    mvc9.server.locals.title = config.ServerName;
-
-    if (config.http.port) {
-      mvc9.ws(mvc9.server).app.ws('/\**/', (conn, req) => {
-        conn.send('hello!-ws');
-      }); 
-      mvc9.server.listen(config.http.port, () => {
-        mvc9.logger.log({ msg: `Server http listen on port ${config.http.port}`});
-      })
+    if (mvc9.config.http) {
+      if (mvc9.config.http.webRootDir) {
+        mvc9.modules.router.initRoutes(`${mvc9.config.baseDir}/${mvc9.config.http.webRootDir}`);
+      }
+      if (config.http.port) {
+        mvc9.ws(mvc9.server).app.ws('/\**/', (conn, req) => {
+          conn.send('hello!-ws');
+        }); 
+        mvc9.server.listen(config.http.port, () => {
+          mvc9.logger.log({ msg: `Server http listen on port ${config.http.port}`});
+        })
+      }
     }
 
-    if (config.https.port) {
-      const httpsCert = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.certFile}`);
-      const httpsKey = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.keyFile}`);
-      mvc9.httpsServer = mvc9.https.createServer({cert: httpsCert, key: httpsKey}, mvc9.server);
-      mvc9.ws(mvc9.server, mvc9.httpsServer);
-      mvc9.httpsServer.listen(config.https.port, () => {
-        mvc9.logger.log({ msg: `Server https listen on port ${config.https.port}`});
-      });
+    if (config.https) {
+      if (config.https.port) {
+        const httpsCert = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.certFile}`);
+        const httpsKey = mvc9.fileSystem.readFileSync(`${mvc9.config.baseDir}/${config.https.keyFile}`);
+        mvc9.httpsServer = mvc9.https.createServer({cert: httpsCert, key: httpsKey}, mvc9.server);
+        mvc9.ws(mvc9.server, mvc9.httpsServer);
+        mvc9.httpsServer.listen(config.https.port, () => {
+          mvc9.logger.log({ msg: `Server https listen on port ${config.https.port}`});
+        });
+      }
     }
 
     mvc9.server.all('/\**/', (req, res) => {
@@ -144,9 +150,10 @@ function MVC9Server(config, memo) {
           }
         }
       }
-      const requestParser = require('./request-parser');
-      res.send(requestParser.generateReport(requestParser.extract(req)));
-      res.end();
+      mvc9.modules.responsor(mvc9, 'request')(req, res);
+      // const requestParser = require('./request-parser');
+      // res.send(requestParser.generateReport(requestParser.extract(req)));
+      // res.end();
     });
   };
 

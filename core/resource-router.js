@@ -1,25 +1,26 @@
 /* map file generate resource map */
 
 const fileSystem = require('fs');
+const path = require('path')
 
 const resRouter = {};
 
 resRouter.routes = {};
 
-resRouter.mapFileSync = (dirPath, charset = 'UTF-8') => {
+resRouter.mapFileSync = (dirPath) => {
   const fileList = [];
   const mapDirFiles = (dirPath) => {
-    const dirFiles = fs.readdirSync(dirPath);
+    const dirFiles = fileSystem.readdirSync(dirPath);
     dirFiles.map((fileName) => {
       const filePath = path.join(dirPath, fileName);
-      if (fs.statSync(filePath).isDirectory()) {
+      if (fileSystem.statSync(filePath).isDirectory()) {
         mapDirFiles(filePath);
       } else {
-        const fileData = fs.readFileSync(filePath, charset);
+        const fileData = fileSystem.readFileSync(filePath, {encoding: null, flag: 'r'});
         fileList.push({
           fileName,
-          fileData,
-          filePath
+          filePath,
+          fileData
         });
       }
     });
@@ -28,12 +29,49 @@ resRouter.mapFileSync = (dirPath, charset = 'UTF-8') => {
   return fileList;
 }
 
+resRouter.fileMapToRoute = (fileMap) => {
+  fileMap.forEach((fileItem) => {
+    const urlPath = fileItem.filePath.replace(resRouter.rootPath, '').replace(/\\/g, '/');
+    if ((/\.c\.js$/g).test(urlPath)) {
+      const path = urlPath.replace(/\.c\.js$/g, '');
+      const routeRes = {type: 'controller', data: require(fileItem.filePath)};
+      resRouter.routes[path] = routeRes;
+    } else if ((/\.ws\.js$/g).test(urlPath)) {
+      const path = urlPath.replace(/\.ws\.js$/g, '');
+      const routeRes = {type: 'websocket', data: require(fileItem.filePath)};
+      resRouter.routes[path] = routeRes;
+    } else {
+      const path = urlPath.replace(/\.\w+$/g, '');
+      const fileType = (urlPath.match(/\.\w+$/g) || [''])[0];
+      const routeRes = {type: fileType, data: fileItem.fileData};
+      resRouter.routes[urlPath] = routeRes;
+      if ((/html$/g).test(fileType)) {
+        if (!resRouter.routes[path]) {
+          resRouter.routes[path] = routeRes;
+        }
+      }
+    }
+  })
+}
+
 resRouter.updateRoute = (path) => {
-  const file = 
+  
 };
 
-resRouter.updateRoutes = (paths) => {};
+resRouter.updateRoutes = (rootPath) => {
+  const fileMap = resRouter.mapFileSync(rootPath);
+  // console.log('fileMap:', fileMap.map(f => f.filePath));
+  resRouter.fileMapToRoute(fileMap);
+  console.log('routeMap:', Object.keys(resRouter.routes));
+};
 
-resRouter.initRoutes = () => {};
+resRouter.initRoutes = (rootPath) => {
+  resRouter.routes = {};
+  resRouter.rootPath = rootPath;
+  resRouter.updateRoutes(rootPath);
+  if (resRouter.routes['index']) {
+    resRouter.routes['/'] = resRouter.routes['index'];
+  }
+};
 
 module.exports = resRouter;

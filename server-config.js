@@ -3,8 +3,6 @@ module.exports = {
   serverName: 'MVC9-Web-Server',
   // your server service name.
   serviceName: 'server-1',
-  // Caution: Enable RequestDebug will turn off your web service!
-  requestDebug: false,
   // global time zone setting, you can use (new Date()).getTimezoneOffset() to get your time zone offset.
   timezoneOffset: -480,
   // server absolute base directory.
@@ -15,14 +13,12 @@ module.exports = {
     port: 8000,
     // where your web service page controllers are.
     webRootDir: 'webApp',
+    // use etag
+    etag: false,
     // turn zlib gzip compression true/false.
     enableCompression: true,
     // level of zlib compression 0-9 (for example 0 disable, 1 faster, 8 normal, 9 best).
-    compressionLevel: 1,
-    // use etag
-    etag: false,
-    // error page path under the WebRootDir, put null to turn off this option to improve the performance of server request.
-    errorPage: 'errorPages'
+    compressionLevel: 1
   },
   // https config.
   https: {
@@ -49,7 +45,7 @@ module.exports = {
     denyTime: 100000,
     // defender white list
     whiteList: {
-      '127.0.0.1': 2000000000000,
+      '127.0.0.11': 2000000000000,
       '0.0.0.0': 2000000000000
     },
     // defender black list
