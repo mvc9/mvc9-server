@@ -40,7 +40,7 @@ module.exports = {
     // how many access history stored to scan
     accessListSize: 10000,
     // how many times in defender.scanDuration will trigger defend.
-    deniedFrequency: 30,
+    deniedFrequency: 50000,
     // defender triggerd deny time(ms)
     denyTime: 100000,
     // defender white list

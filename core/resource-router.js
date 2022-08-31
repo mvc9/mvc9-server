@@ -54,23 +54,17 @@ resRouter.fileMapToRoute = (fileMap) => {
   })
 }
 
-resRouter.updateRoute = (path) => {
-  
-};
-
 resRouter.updateRoutes = (rootPath) => {
   const fileMap = resRouter.mapFileSync(rootPath);
-  // console.log('fileMap:', fileMap.map(f => f.filePath));
   resRouter.fileMapToRoute(fileMap);
-  console.log('routeMap:', Object.keys(resRouter.routes));
 };
 
 resRouter.initRoutes = (rootPath) => {
   resRouter.routes = {};
   resRouter.rootPath = rootPath;
   resRouter.updateRoutes(rootPath);
-  if (resRouter.routes['index']) {
-    resRouter.routes['/'] = resRouter.routes['index'];
+  if (resRouter.routes['/index']) {
+    resRouter.routes['/'] = resRouter.routes['/index'];
   }
 };
 

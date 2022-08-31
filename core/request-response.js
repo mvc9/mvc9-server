@@ -16,7 +16,7 @@ module.exports = function (mvc9, serveType) {
             if (routeRes.data.name === 'reqControl') {
               req.reqInfo = reqInfo;
               try {
-                routeRes.data(req, res);
+                routeRes.data(mvc9)(req, res);
               } catch (err) {
                 mvc9.logger.log({msg: err, type: -1});
                 res.status(505);

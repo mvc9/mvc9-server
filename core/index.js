@@ -116,6 +116,7 @@ function MVC9Server(config, memo) {
     if (mvc9.config.http) {
       if (mvc9.config.http.webRootDir) {
         mvc9.modules.router.initRoutes(`${mvc9.config.baseDir}/${mvc9.config.http.webRootDir}`);
+        mvc9.logger.log({ msg: `Router: Route map items count = ${Object.keys(mvc9.modules.router.routes).length}`});
       }
       if (config.http.port) {
         mvc9.ws(mvc9.server).app.ws('/\**/', (conn, req) => {
