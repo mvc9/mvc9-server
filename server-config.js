@@ -12,9 +12,11 @@ module.exports = {
     // http listen port, set port null or undefined to disable http listen.
     port: 8000,
     // where your web service page controllers are.
-    webRootDir: 'webApp',
+    webRootDir: 'www',
     // use etag
     etag: false,
+    // keep alive (seconds) default 5s
+    keepAlive: 5,
     // turn zlib gzip compression true/false.
     enableCompression: true,
     // level of zlib compression 0-9 (for example 0 disable, 1 faster, 8 normal, 9 best).

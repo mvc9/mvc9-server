@@ -108,7 +108,14 @@ function MVC9Server(config, memo) {
     mvc9.server.locals.title = config.ServerName;
     mvc9.server.use(mvc9.modules.defender(mvc9));
     mvc9.server.use(mvc9.expressMiddleWare.bodyParser.json({limit: '1024kb'}));
-    mvc9.server.use(mvc9.expressMiddleWare.bodyParser.urlencoded({limit: '4096kb', extended: true}));
+    // mvc9.server.use(mvc9.expressMiddleWare.bodyParser.text({limit: '1024kb'}));
+    // mvc9.server.use(mvc9.expressMiddleWare.bodyParser.urlencoded({limit: '1024kb', extended: false}));
+    mvc9.server.use(mvc9.expressMiddleWare.bodyParser.raw({limit: '8192kb', type: (req) => {
+      const contentType = String(req.headers['content-type']).toLowerCase();
+      const matchIndex = (['application/json', 'www-x-form-encoded']).indexOf(contentType);
+      return matchIndex === -1;
+    }
+    }));
     config.http.compressionOption = { level: config.http.CompressionLevel };
     config.http.enableCompression ? mvc9.server.use(mvc9.expressMiddleWare.compression(config.http.compressionOption)) : null;
     config.http.etag ? null : mvc9.server.disable('etag');
