@@ -34,7 +34,7 @@ resRouter.fileMapToRoute = (fileMap) => {
     const urlPath = fileItem.filePath.replace(resRouter.rootPath, '').replace(/\\/g, '/');
     if ((/\.c\.js$/g).test(urlPath)) {
       const path = urlPath.replace(/\.c\.js$/g, '');
-      const routeRes = {type: 'controller', data: require(fileItem.filePath)};
+      const routeRes = {type: 'request', data: require(fileItem.filePath)};
       resRouter.routes[path] = routeRes;
     } else if ((/\.ws\.js$/g).test(urlPath)) {
       const path = urlPath.replace(/\.ws\.js$/g, '');

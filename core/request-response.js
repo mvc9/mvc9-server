@@ -12,24 +12,27 @@ module.exports = function (mvc9, serveType) {
             res.type(routeRes.type);
             res.end(routeRes.data);
           break;
-          case 'controller':
-            if (routeRes.data.name === 'reqControl') {
+          case 'request':
+            if (routeRes.data.name === 'requestControl') {
               req.reqInfo = reqInfo;
               try {
+                mvc9.logger.log({msg: `REQUEST: status=${200} client=${reqInfo.IPv4} method=${reqInfo.method} host=${reqInfo.host} URL=${reqInfo.url} bodyLenth=${reqInfo.body && reqInfo.body.length !== undefined ? reqInfo.body.length : 'null'}`, type: 3});
                 routeRes.data(mvc9)(req, res);
               } catch (err) {
+                mvc9.logger.log({msg: `REQUEST: status=${500} client=${reqInfo.IPv4} method=${reqInfo.method} host=${reqInfo.host} URL=${reqInfo.url} bodyLenth=${reqInfo.body && reqInfo.body.length !== undefined ? reqInfo.body.length : 'null'}`, type: 3});
                 mvc9.logger.log({msg: err, type: -1});
                 res.status(505);
                 res.end();
               }
             } else {
               mvc9.logger.log({msg: `Router: Wrong controller function name of url "${routePath}", request will return error 500.`, type: -1});
-              res.status(500);
+              res.status(501);
               res.end();
             }
           break;
         }
       } else {
+        mvc9.logger.log({msg: `REQUEST: status=${404} [${reqInfo.IPv4}] method=${reqInfo.method} host=${reqInfo.host} URL=${reqInfo.url} bodyLenth=${reqInfo.body ? reqInfo.body.length : null}`, type: 3});
         res.status(404);
         res.end();
       }

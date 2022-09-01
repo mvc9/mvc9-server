@@ -1,8 +1,9 @@
 
-module.exports = function reqControl(mvc9) {
+module.exports = function requestControl(mvc9) {
   return (req, res) => {
-    console.log('------- upload -------:');
-    console.log(req.body);
+    mvc9.logger.log({msg: 'Upload: receive byte length = ' + req.body.length});
+    mvc9.logger.log({msg: 'Upload: receive bytes content:'});
+    mvc9.logger.log({msg: JSON.stringify(req.body)});
     res.send(mvc9.modules.parser.generateReport(req.reqInfo));
     res.end();
   }

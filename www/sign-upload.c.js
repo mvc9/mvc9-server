@@ -1,11 +1,13 @@
 
-module.exports = function reqControl(mvc9) {
+module.exports = function requestControl(mvc9) {
   return (req, res) => {
+    res.set('Content-Type', 'application/json');
     res.end(JSON.stringify({
       data: {
-        signUrl: 'https://127.0.0.1/upload'
+        signUrl: 'http://127.0.0.1:8000/upload'
       },
-      code: 200
+      code: 200,
+      msg: ''
     }));
   }
 }

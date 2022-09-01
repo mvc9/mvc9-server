@@ -86,6 +86,8 @@ function LogService(config) {
       const currentTime = new Date();
       const currentTimeInt = currentTime.getTime();
       const splitCheckDuriation = 60 * 1000;
+      const currentDateStr = logService.getCurrentDate(currentTime, logService.config.timezoneOffset);
+      const currentLogDate = currentDateStr.replace(/T/g, ' ');
       if ((currentTimeInt - logService.httpLogger.lastSplitCheckTime) > splitCheckDuriation) {
         logService.httpLogger.lastSplitCheckTime = currentTimeInt;
         const currentDateFileName = logService.getDailyFileName(currentTime);
@@ -93,8 +95,12 @@ function LogService(config) {
           logService.httpLogger.closeStream();
           logService.httpLogger.start(logService.config.log.httpLogPath, currentDateFileName);
         }
-        logService.httpLogger.log(msg);
       }
+      const logMsgStr = `[${currentLogDate}]: ${msg}`;
+      if (logService.config.log.logOnConsole) {
+        console.log(`[${currentLogDate}]:`, msg);
+      }
+      logService.httpLogger.log(logMsgStr);
     }
   }
   
@@ -103,6 +109,8 @@ function LogService(config) {
       const currentTime = new Date();
       const currentTimeInt = currentTime.getTime();
       const splitCheckDuriation = 60 * 1000;
+      const currentDateStr = logService.getCurrentDate(currentTime, logService.config.timezoneOffset);
+      const currentLogDate = currentDateStr.replace(/T/g, ' ');
       if ((currentTimeInt - logService.wsLogger.lastSplitCheckTime) > splitCheckDuriation) {
         logService.wsLogger.lastSplitCheckTime = currentTimeInt;
         const currentDateFileName = logService.getDailyFileName(currentTime);
@@ -110,8 +118,12 @@ function LogService(config) {
           logService.wsLogger.closeStream();
           logService.wsLogger.start(logService.config.log.wsLogPath, currentDateFileName);
         }
-        logService.wsLogger.log(msg);
       }
+      const logMsgStr = `[${currentLogDate}]: ${msg}`;
+      if (logService.config.log.logOnConsole) {
+        console.log(`[${currentLogDate}]:`, msg);
+      }
+      logService.wsLogger.log(logMsgStr);
     }
   }
   
@@ -129,7 +141,6 @@ function LogService(config) {
           logService.errorLogger.closeStream();
           logService.errorLogger.start(logService.config.log.errorLogPath, currentDateFileName);
         }
-        
       }
       const logMsgStr = `[${currentLogDate}]: ${msg.stack ? msg.stack : msg}`;
       if (logService.config.log.logOnConsole) {
@@ -158,7 +169,7 @@ function LogService(config) {
         break;
     }
   }
-    
+
   logService.unhandledPromiseRejection = process.on('unhandledRejection', (reason, promiseRefer) => {
     logService.log({
       msg: "PROMISE REJECTION: Unhandled Rejection at: Promise",

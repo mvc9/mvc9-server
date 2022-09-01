@@ -44,7 +44,11 @@ function LogFileStream() {
 
   logger.log = (string) => {
     if (logger.logStream) {
-      logger.logStream.write(string + '\r\n')
+      try {
+        logger.logStream.write(string + '\r\n')
+      } catch (err) {
+        throw err;
+      }
     } else {
       console.warn('write log failed as logStream not ready, content:\r\b', string)
     }
